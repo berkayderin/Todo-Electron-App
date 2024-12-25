@@ -1,5 +1,20 @@
-const { app, BrowserWindow } = require('electron')
+const {
+	app,
+	BrowserWindow,
+	Notification,
+	ipcMain,
+	dialog
+} = require('electron')
 const path = require('path')
+
+// Bildirim gönderme fonksiyonu
+function showNotification(title, body) {
+	new Notification({
+		title: title,
+		body: body,
+		icon: path.join(__dirname, 'src/assets/notification-icon.png') // İsteğe bağlı
+	}).show()
+}
 
 function createWindow() {
 	const win = new BrowserWindow({
@@ -17,6 +32,11 @@ function createWindow() {
 	win.maximize()
 	win.setMenuBarVisibility(false)
 	win.loadFile('src/index.html')
+
+	// IPC mesajlarını dinle
+	ipcMain.on('show-notification', (event, { title, body }) => {
+		showNotification(title, body)
+	})
 }
 
 app.whenReady().then(() => {
@@ -32,5 +52,33 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
 		app.quit()
+	}
+})
+
+// IPC olaylarını dinle
+ipcMain.handle('export-todos', async () => {
+	const { filePath } = await dialog.showSaveDialog({
+		title: 'Todoları Dışa Aktar',
+		defaultPath: path.join(
+			app.getPath('documents'),
+			'todos-export.json'
+		),
+		filters: [{ name: 'JSON', extensions: ['json'] }]
+	})
+
+	if (filePath) {
+		return filePath
+	}
+})
+
+ipcMain.handle('import-todos', async () => {
+	const { filePaths } = await dialog.showOpenDialog({
+		title: 'Todoları İçe Aktar',
+		properties: ['openFile'],
+		filters: [{ name: 'JSON', extensions: ['json'] }]
+	})
+
+	if (filePaths && filePaths.length > 0) {
+		return filePaths[0]
 	}
 })

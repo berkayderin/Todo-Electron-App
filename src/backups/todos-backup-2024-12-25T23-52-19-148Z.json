@@ -1,0 +1,35 @@
+{
+    "todo": [],
+    "inprogress": [
+        {
+            "id": 1735168851004,
+            "title": "Edebiyat",
+            "description": "Hafta 6 slaytındayım. Başa doğru git",
+            "priority": "high",
+            "dueDate": "2024-12-26",
+            "tags": [
+                "hallet"
+            ],
+            "completed": false,
+            "created_at": "2024-12-25T23:20:51.002Z",
+            "completed_at": "2024-12-25T23:45:56.021Z",
+            "notes": ""
+        }
+    ],
+    "done": [
+        {
+            "id": 1735166837444,
+            "title": "İnkılap",
+            "description": "Cuma gününe kadar bitir",
+            "priority": "high",
+            "dueDate": "2024-12-26",
+            "tags": [
+                "hallet"
+            ],
+            "completed": false,
+            "created_at": "2024-12-25T22:47:17.444Z",
+            "completed_at": "2024-12-25T23:45:47.996Z",
+            "notes": ""
+        }
+    ]
+}

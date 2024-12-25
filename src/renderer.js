@@ -1,7 +1,41 @@
 const db = require('./database')
+const { ipcRenderer } = require('electron')
 
 // Veritabanını başlat
 db.initDatabase()
+
+// Bildirim fonksiyonunu global scope'a taşı
+function sendNotification(title, body) {
+	ipcRenderer.send('show-notification', { title, body })
+}
+
+// Görev son tarihi yaklaşan todolar için bildirim kontrolü
+async function checkDueDateNotifications() {
+	try {
+		const todos = await db.getTodos()
+		const now = new Date()
+		const oneDayInMs = 24 * 60 * 60 * 1000
+
+		Object.values(todos)
+			.flat()
+			.forEach((todo) => {
+				if (todo.dueDate && !todo.completed) {
+					const dueDate = new Date(todo.dueDate)
+					const timeUntilDue = dueDate - now
+
+					// Son 24 saat kaldıysa bildirim gönder
+					if (timeUntilDue > 0 && timeUntilDue <= oneDayInMs) {
+						sendNotification(
+							'Görev Hatırlatması',
+							`"${todo.title}" görevi için son 24 saat!`
+						)
+					}
+				}
+			})
+	} catch (error) {
+		console.error('Bildirim kontrolü sırasında hata:', error)
+	}
+}
 
 const categories = ['todo', 'inprogress', 'done']
 const todoModal = document.getElementById('todoModal')
@@ -258,6 +292,16 @@ editModalForm.addEventListener('submit', async (e) => {
 window.toggleTodo = async function (id, completed, category) {
 	try {
 		await db.updateTodo(id, { completed }, category)
+		if (completed) {
+			const todos = await db.getTodos()
+			const todo = todos[category].find((t) => t.id === id)
+			if (todo) {
+				sendNotification(
+					'Görev Tamamlandı',
+					`"${todo.title}" görevi başarıyla tamamlandı!`
+				)
+			}
+		}
 		loadTodos()
 	} catch (error) {
 		console.error('Todo durumu güncellenirken hata:', error)
@@ -313,12 +357,9 @@ async function loadTodos() {
 
 		categories.forEach((category) => {
 			const todoList = document.getElementById(`${category}-list`)
-			if (!todoList) return
-
 			todoList.innerHTML = ''
-			const categoryTodos = todos[category] || []
 
-			categoryTodos.forEach((todo) => {
+			todos[category].forEach((todo) => {
 				const li = document.createElement('li')
 				li.className =
 					'bg-white/95 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-5 mb-3 cursor-move'
@@ -340,7 +381,7 @@ async function loadTodos() {
 								<div class="relative">
 									<input type="checkbox" 
 										   class="todo-checkbox w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 transition-all duration-200" 
-										   ${todo.completed ? 'checked' : ''}>
+										${todo.completed ? 'checked' : ''}>
 								</div>
 								<div>
 									<h3 class="font-medium ${
@@ -404,17 +445,17 @@ async function loadTodos() {
 							${
 								todo.dueDate
 									? `
-								<span class="flex items-center px-2.5 py-1 text-xs font-medium ${
-									new Date(todo.dueDate) < new Date()
-										? 'bg-red-50 text-red-600'
-										: 'bg-gray-100 text-gray-600'
-								} rounded-full ml-auto">
-									<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-									</svg>
-									${new Date(todo.dueDate).toLocaleDateString('tr-TR')}
-								</span>
-							`
+									<span class="flex items-center px-2.5 py-1 text-xs font-medium ${
+										new Date(todo.dueDate) < new Date()
+											? 'bg-red-50 text-red-600'
+											: 'bg-gray-100 text-gray-600'
+									} rounded-full ml-auto">
+										<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										</svg>
+										${new Date(todo.dueDate).toLocaleDateString('tr-TR')}
+									</span>
+								`
 									: ''
 							}
 						</div>
@@ -429,7 +470,7 @@ async function loadTodos() {
 
 				const viewButton = li.querySelector('.view-todo-btn')
 				viewButton.addEventListener('click', () => {
-					window.openDetailModal(todo, category)
+					openDetailModal(todo, category)
 				})
 
 				const editButton = li.querySelector('.edit-todo-btn')
@@ -548,35 +589,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Modal dışına tıklandığında kapat
 	detailModalOverlay.addEventListener('click', closeDetailModal)
-})
 
-// Form submit olayını dinle
-todoModalForm.addEventListener('submit', async (e) => {
-	e.preventDefault()
-	const category = todoCategory.value
-	const todoData = {
-		title: document.getElementById('todoTitle').value.trim(),
-		description: document
-			.getElementById('todoDescription')
-			.value.trim(),
-		priority: document.getElementById('todoPriority').value,
-		dueDate: document.getElementById('todoDueDate').value,
-		tags: document
-			.getElementById('todoTags')
-			.value.split(',')
-			.map((tag) => tag.trim())
-			.filter((tag) => tag),
-		notes: document.getElementById('todoNotes').value.trim(),
-		completed: false,
-		created_at: new Date().toISOString()
+	// Her saat başı bildirim kontrolü yap
+	setInterval(checkDueDateNotifications, 60 * 60 * 1000)
+
+	// Sayfa yüklendiğinde ilk kontrolü yap
+	checkDueDateNotifications()
+
+	// Form submit olayını dinle
+	todoModalForm.addEventListener('submit', async (e) => {
+		e.preventDefault()
+		const category = todoCategory.value
+		const todoData = {
+			title: document.getElementById('todoTitle').value.trim(),
+			description: document
+				.getElementById('todoDescription')
+				.value.trim(),
+			priority: document.getElementById('todoPriority').value,
+			dueDate: document.getElementById('todoDueDate').value,
+			tags: document
+				.getElementById('todoTags')
+				.value.split(',')
+				.map((tag) => tag.trim())
+				.filter((tag) => tag),
+			notes: document.getElementById('todoNotes').value.trim(),
+			completed: false,
+			created_at: new Date().toISOString()
+		}
+
+		try {
+			await db.addTodo(todoData, category)
+			sendNotification(
+				'Yeni Görev Eklendi',
+				`"${todoData.title}" görevi başarıyla eklendi.`
+			)
+			closeTodoModal()
+			loadTodos()
+		} catch (error) {
+			console.error('Todo eklenirken hata:', error)
+		}
+	})
+
+	// Otomatik yedeklemeyi başlat
+	startAutoBackup()
+
+	// Dışa/İçe aktarma butonları için event listener'lar
+	const exportTodosBtn = document.getElementById('exportTodosBtn')
+	const importTodosBtn = document.getElementById('importTodosBtn')
+
+	if (exportTodosBtn) {
+		exportTodosBtn.addEventListener('click', exportTodosToFile)
 	}
 
-	try {
-		await db.addTodo(todoData, category)
-		closeTodoModal()
-		loadTodos()
-	} catch (error) {
-		console.error('Todo eklenirken hata:', error)
+	if (importTodosBtn) {
+		importTodosBtn.addEventListener('click', importTodosFromFile)
 	}
 })
 
@@ -720,26 +786,49 @@ function closeDetailModal() {
 	}, 300)
 }
 
-// Detay butonunu ekle (edit ve delete butonlarının yanına)
-li.querySelector('.flex.items-center.space-x-1').insertAdjacentHTML(
-	'afterbegin',
-	`
-	<button class="view-todo-btn p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-200">
-		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-		</svg>
-	</button>
-`
-)
+// Yedekleme ve dışa aktarma fonksiyonları
+async function exportTodosToFile() {
+	try {
+		const exportPath = await ipcRenderer.invoke('export-todos')
+		if (exportPath) {
+			await db.exportTodos(exportPath)
+			sendNotification(
+				'Dışa Aktarma Başarılı',
+				'Todolar başarıyla dışa aktarıldı.'
+			)
+		}
+	} catch (error) {
+		console.error('Dışa aktarma hatası:', error)
+		sendNotification(
+			'Dışa Aktarma Hatası',
+			'Todolar dışa aktarılırken bir hata oluştu.'
+		)
+	}
+}
 
-// Detay butonu için event listener ekle
-const viewButton = li.querySelector('.view-todo-btn')
-viewButton.addEventListener('click', () => {
-	window.openDetailModal(todo, category)
-})
+async function importTodosFromFile() {
+	try {
+		const importPath = await ipcRenderer.invoke('import-todos')
+		if (importPath) {
+			await db.importTodos(importPath)
+			await loadTodos()
+			sendNotification(
+				'İçe Aktarma Başarılı',
+				'Todolar başarıyla içe aktarıldı.'
+			)
+		}
+	} catch (error) {
+		console.error('İçe aktarma hatası:', error)
+		sendNotification(
+			'İçe Aktarma Hatası',
+			'Todolar içe aktarılırken bir hata oluştu.'
+		)
+	}
+}
 
-// Global fonksiyonu tanımla
-window.openDetailModal = function (todo, category) {
-	openDetailModal(todo, category)
+// Otomatik yedekleme kontrolü
+async function startAutoBackup() {
+	await db.checkAndCreateBackup()
+	// Her 24 saatte bir yedekleme kontrolü yap
+	setInterval(db.checkAndCreateBackup, 24 * 60 * 60 * 1000)
 }

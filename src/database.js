@@ -2,6 +2,7 @@ const fs = require('fs').promises
 const path = require('path')
 
 const todosPath = path.join(__dirname, 'todos.json')
+const backupDir = path.join(__dirname, 'backups')
 
 async function readTodosFile() {
 	try {
@@ -120,10 +121,103 @@ async function deleteTodo(id, category) {
 	}
 }
 
+// Yedekleme ve dışa aktarma fonksiyonları
+async function ensureBackupDir() {
+	try {
+		await fs.access(backupDir)
+	} catch {
+		try {
+			await fs.mkdir(backupDir, { recursive: true })
+		} catch (error) {
+			console.error('Backup dizini oluşturma hatası:', error)
+			throw error
+		}
+	}
+}
+
+async function createBackup() {
+	try {
+		await ensureBackupDir()
+		const data = await readTodosFile()
+		const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+		const backupPath = path.join(
+			backupDir,
+			`todos-backup-${timestamp}.json`
+		)
+		await fs.writeFile(backupPath, JSON.stringify(data, null, 4))
+		console.log('Yedekleme başarıyla oluşturuldu:', backupPath)
+		return backupPath
+	} catch (error) {
+		console.error('Yedekleme oluşturulurken hata:', error)
+		throw error
+	}
+}
+
+async function exportTodos(exportPath) {
+	try {
+		const data = await readTodosFile()
+		await fs.writeFile(exportPath, JSON.stringify(data, null, 4))
+		console.log('Veriler başarıyla dışa aktarıldı:', exportPath)
+		return true
+	} catch (error) {
+		console.error('Dışa aktarma hatası:', error)
+		throw error
+	}
+}
+
+async function importTodos(importPath) {
+	try {
+		const data = await fs.readFile(importPath, 'utf8')
+		const importedData = JSON.parse(data)
+		await writeTodosFile(importedData)
+		console.log('Veriler başarıyla içe aktarıldı')
+		return true
+	} catch (error) {
+		console.error('İçe aktarma hatası:', error)
+		throw error
+	}
+}
+
+// Otomatik yedekleme için son yedekleme zamanını kontrol et
+async function checkAndCreateBackup() {
+	try {
+		await ensureBackupDir()
+
+		const files = await fs.readdir(backupDir)
+		const backupInterval = 24 * 60 * 60 * 1000 // 24 saat
+
+		if (files.length === 0) {
+			return await createBackup()
+		}
+
+		const lastBackup = files
+			.filter((f) => f.startsWith('todos-backup-'))
+			.sort()
+			.pop()
+
+		if (lastBackup) {
+			const lastBackupTime = new Date(
+				lastBackup.split('todos-backup-')[1].split('.')[0]
+			)
+			const now = new Date()
+
+			if (now - lastBackupTime >= backupInterval) {
+				return await createBackup()
+			}
+		}
+	} catch (error) {
+		console.error('Yedekleme kontrolü sırasında hata:', error)
+	}
+}
+
 module.exports = {
 	initDatabase,
 	addTodo,
 	getTodos,
 	updateTodo,
-	deleteTodo
+	deleteTodo,
+	createBackup,
+	exportTodos,
+	importTodos,
+	checkAndCreateBackup
 }
