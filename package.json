@@ -1,0 +1,16 @@
+{
+  "name": "todo-electronjs",
+  "version": "1.0.0",
+  "description": "Electron.js ile geliştirilmiş Todo uygulaması",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "watch": "npx tailwindcss -i ./src/input.css -o ./src/output.css --watch"
+  },
+  "dependencies": {
+    "electron": "^28.0.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.6"
+  }
+} 

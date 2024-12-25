@@ -1,0 +1,41 @@
+# Electron ve Node.js
+node_modules/
+dist/
+out/
+
+# Tailwind CSS çıktı dosyası
+src/output.css
+
+# Veritabanı dosyası
+src/todos.json
+
+# IDE ve Editör dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Log dosyaları
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# Derleme dosyaları
+build/
+*.exe
+*.dmg
+*.app
+*.zip
+*.tar.gz
+
+# Ortam değişkenleri
+.env
+.env.local
+.env.*.local
+
+# Cache dosyaları
+.cache/
+.parcel-cache/
