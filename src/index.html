@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="tr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; 
+					style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+					font-src 'self' https://fonts.gstatic.com;
+					img-src 'self' data: https:;
+					script-src 'self';"
+		/>
+		<title>Todo Uygulaması</title>
+		<link href="output.css" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* Temel stiller */
+			.todo-list {
+				min-height: 10px;
+			}
+
+			.todo-list > li {
+				background: white;
+				border-radius: 0.75rem;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+				margin-bottom: 0.5rem;
+			}
+
+			.todo-list > li:hover {
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+			}
+
+			/* Saydamlık sınıfları */
+			.bg-white\/95 {
+				background-color: rgba(255, 255, 255, 0.95);
+			}
+			.bg-white\/10 {
+				background-color: rgba(255, 255, 255, 0.1);
+			}
+			.bg-white\/20 {
+				background-color: rgba(255, 255, 255, 0.2);
+			}
+			.bg-white\/30 {
+				background-color: rgba(255, 255, 255, 0.3);
+			}
+
+			/* Öncelik renkleri */
+			.bg-emerald-50 {
+				background-color: #ecfdf5;
+			}
+			.text-emerald-700 {
+				color: #047857;
+			}
+			.bg-amber-50 {
+				background-color: #fffbeb;
+			}
+			.text-amber-700 {
+				color: #b45309;
+			}
+			.bg-rose-50 {
+				background-color: #fff1f2;
+			}
+			.text-rose-700 {
+				color: #be123c;
+			}
+		</style>
+	</head>
+	<body
+		class="bg-gradient-to-br from-blue-600 to-blue-700 min-h-screen font-['Plus_Jakarta_Sans']"
+	>
+		<!-- Todo Ekleme Modal -->
+		<div
+			id="todoModal"
+			class="invisible opacity-0 fixed inset-0 flex items-center justify-center z-50"
+		>
+			<div
+				class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+			></div>
+			<div
+				class="relative bg-white rounded-xl p-6 w-full max-w-lg transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3 class="text-xl font-semibold text-gray-900">
+						Yeni Kart Ekle
+					</h3>
+					<button
+						class="text-gray-400 hover:text-gray-500 close-todo-modal"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+				<form id="todoModalForm" class="space-y-5">
+					<input type="hidden" id="todoCategory" />
+					<div>
+						<input
+							type="text"
+							id="todoTitle"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Kart başlığı"
+							required
+						/>
+					</div>
+					<div>
+						<textarea
+							id="todoDescription"
+							rows="3"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Açıklama"
+						></textarea>
+					</div>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<select
+								id="todoPriority"
+								class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 transition-all duration-200"
+							>
+								<option value="low">Düşük Öncelik</option>
+								<option value="medium">Orta Öncelik</option>
+								<option value="high">Yüksek Öncelik</option>
+							</select>
+						</div>
+						<div>
+							<input
+								type="date"
+								id="todoDueDate"
+								class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 transition-all duration-200"
+							/>
+						</div>
+					</div>
+					<div>
+						<input
+							type="text"
+							id="todoTags"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Etiketler (virgülle ayırın)"
+						/>
+					</div>
+					<div>
+						<textarea
+							id="todoNotes"
+							rows="2"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Notlar"
+						></textarea>
+					</div>
+					<div class="flex justify-end gap-3 mt-6">
+						<button
+							type="button"
+							class="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 close-todo-modal"
+						>
+							İptal
+						</button>
+						<button
+							type="submit"
+							class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200"
+						>
+							Kart Ekle
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Kart Düzenleme Modal -->
+		<div
+			id="editModal"
+			class="invisible opacity-0 fixed inset-0 flex items-center justify-center z-50"
+		>
+			<div
+				class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+			></div>
+			<div
+				class="relative bg-white rounded-xl p-6 w-full max-w-lg transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3 class="text-xl font-semibold text-gray-900">
+						Kartı Düzenle
+					</h3>
+					<button
+						class="text-gray-400 hover:text-gray-500 close-edit-modal"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+				<form id="editModalForm" class="space-y-5">
+					<input type="hidden" id="editTodoId" />
+					<input type="hidden" id="editTodoCategory" />
+					<div>
+						<input
+							type="text"
+							id="editTodoTitle"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Kart başlığı"
+							required
+						/>
+					</div>
+					<div>
+						<textarea
+							id="editTodoDescription"
+							rows="3"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Açıklama"
+						></textarea>
+					</div>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<select
+								id="editTodoPriority"
+								class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 transition-all duration-200"
+							>
+								<option value="low">Düşük Öncelik</option>
+								<option value="medium">Orta Öncelik</option>
+								<option value="high">Yüksek Öncelik</option>
+							</select>
+						</div>
+						<div>
+							<input
+								type="date"
+								id="editTodoDueDate"
+								class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 transition-all duration-200"
+							/>
+						</div>
+					</div>
+					<div>
+						<input
+							type="text"
+							id="editTodoTags"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Etiketler (virgülle ayırın)"
+						/>
+					</div>
+					<div>
+						<textarea
+							id="editTodoNotes"
+							rows="2"
+							class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 transition-all duration-200"
+							placeholder="Notlar"
+						></textarea>
+					</div>
+					<div class="flex justify-end gap-3 mt-6">
+						<button
+							type="button"
+							class="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 close-edit-modal"
+						>
+							İptal
+						</button>
+						<button
+							type="submit"
+							class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200"
+						>
+							Değişiklikleri Kaydet
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Silme Onay Modal -->
+		<div
+			id="deleteModal"
+			class="invisible opacity-0 fixed inset-0 flex items-center justify-center z-50"
+		>
+			<div
+				class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+			></div>
+			<div
+				class="relative bg-white rounded-xl p-6 w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3 class="text-xl font-semibold text-gray-900">
+						Kartı Sil
+					</h3>
+					<button
+						class="text-gray-400 hover:text-gray-500 close-delete-modal"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="space-y-4">
+					<div class="text-gray-600">
+						Bu kartı silmek istediğinizden emin misiniz? Bu işlem geri
+						alınamaz.
+					</div>
+					<div class="flex justify-end gap-3">
+						<button
+							type="button"
+							class="close-delete-modal px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200"
+						>
+							İptal
+						</button>
+						<button
+							type="button"
+							id="confirmDelete"
+							class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200"
+						>
+							Sil
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Kart Detay Modal -->
+		<div
+			id="detailModal"
+			class="invisible opacity-0 fixed inset-0 flex items-center justify-center z-50"
+		>
+			<div
+				class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+			></div>
+			<div
+				class="relative bg-white rounded-xl p-6 w-full max-w-2xl transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3 class="text-xl font-semibold text-gray-900">
+						Kart Detayı
+					</h3>
+					<button
+						class="text-gray-400 hover:text-gray-500 close-detail-modal"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="space-y-6" id="todoDetail">
+					<!-- Detay içeriği JavaScript ile doldurulacak -->
+				</div>
+			</div>
+		</div>
+
+		<div class="min-h-screen">
+			<div class="py-6 px-6">
+				<div class="max-w-7xl mx-auto">
+					<div class="flex items-center justify-between">
+						<h1 class="text-2xl font-semibold text-white">
+							Todo Uygulaması
+						</h1>
+						<div class="flex items-center gap-4">
+							<button
+								class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200"
+							>
+								<svg
+									class="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+									/>
+								</svg>
+							</button>
+							<button
+								class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200"
+							>
+								<svg
+									class="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="px-6 py-8">
+				<div class="max-w-7xl mx-auto">
+					<div class="grid grid-cols-3 gap-6">
+						<!-- Yapılacaklar -->
+						<div class="w-[400px]">
+							<div
+								class="list-container bg-white/10 backdrop-blur-lg rounded-xl p-4"
+								data-category="todo"
+							>
+								<div class="flex items-center justify-between mb-4">
+									<h2 class="text-lg font-semibold text-white">
+										Yapılacaklar
+									</h2>
+									<button
+										class="add-todo-btn text-white hover:text-white/80"
+										data-category="todo"
+									>
+										<svg
+											class="w-5 h-5"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 4v16m8-8H4"
+											/>
+										</svg>
+									</button>
+								</div>
+								<ul
+									id="todo-list"
+									class="space-y-3 min-h-[200px]"
+								></ul>
+							</div>
+						</div>
+
+						<!-- Devam Edenler -->
+						<div class="w-[400px]">
+							<div
+								class="list-container bg-white/10 backdrop-blur-lg rounded-xl p-4"
+								data-category="inprogress"
+							>
+								<div class="flex items-center justify-between mb-4">
+									<h2 class="text-lg font-semibold text-white">
+										Devam Edenler
+									</h2>
+									<button
+										class="add-todo-btn text-white hover:text-white/80"
+										data-category="inprogress"
+									>
+										<svg
+											class="w-5 h-5"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 4v16m8-8H4"
+											/>
+										</svg>
+									</button>
+								</div>
+								<ul
+									id="inprogress-list"
+									class="space-y-3 min-h-[200px]"
+								></ul>
+							</div>
+						</div>
+
+						<!-- Tamamlananlar -->
+						<div class="w-[400px]">
+							<div
+								class="list-container bg-white/10 backdrop-blur-lg rounded-xl p-4"
+								data-category="done"
+							>
+								<div class="flex items-center justify-between mb-4">
+									<h2 class="text-lg font-semibold text-white">
+										Tamamlananlar
+									</h2>
+									<button
+										class="add-todo-btn text-white hover:text-white/80"
+										data-category="done"
+									>
+										<svg
+											class="w-5 h-5"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 4v16m8-8H4"
+											/>
+										</svg>
+									</button>
+								</div>
+								<ul
+									id="done-list"
+									class="space-y-3 min-h-[200px]"
+								></ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="renderer.js"></script>
+	</body>
+</html>
