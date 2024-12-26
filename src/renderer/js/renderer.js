@@ -423,7 +423,12 @@ async function loadTodos() {
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 										</svg>
 									</button>
-									<button class="edit-todo-btn p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all duration-200">
+									<button class="copy-todo-btn p-1.5 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all duration-200">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+										</svg>
+									</button>
+									<button class="edit-todo-btn p-1.5 text-gray-400 hover:text-yellow-600 rounded-lg hover:bg-yellow-50 transition-all duration-200">
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
 										</svg>
@@ -443,10 +448,10 @@ async function loadTodos() {
 									? todo.tags
 											.map(
 												(tag) => `
-									<span class="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded-full">
-										${tag}
-									</span>
-								`
+								<span class="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded-full">
+									${tag}
+								</span>
+							`
 											)
 											.join('')
 									: ''
@@ -455,17 +460,17 @@ async function loadTodos() {
 							${
 								todo.dueDate
 									? `
-									<span class="flex items-center px-2.5 py-1 text-xs font-medium ${
-										new Date(todo.dueDate) < new Date()
-											? 'bg-red-50 text-red-600'
-											: 'bg-gray-100 text-gray-600'
-									} rounded-full ml-auto">
-										<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-										</svg>
-										${new Date(todo.dueDate).toLocaleDateString('tr-TR')}
-									</span>
-								`
+								<span class="flex items-center px-2.5 py-1 text-xs font-medium ${
+									new Date(todo.dueDate) < new Date()
+										? 'bg-red-50 text-red-600'
+										: 'bg-gray-100 text-gray-600'
+								} rounded-full ml-auto">
+									<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+									${new Date(todo.dueDate).toLocaleDateString('tr-TR')}
+								</span>
+							`
 									: ''
 							}
 						</div>
@@ -479,18 +484,27 @@ async function loadTodos() {
 				})
 
 				const viewButton = li.querySelector('.view-todo-btn')
-				viewButton.addEventListener('click', () => {
+				viewButton.addEventListener('click', (e) => {
+					e.stopPropagation()
 					openDetailModal(todo, category)
 				})
 
+				const copyButton = li.querySelector('.copy-todo-btn')
+				copyButton.addEventListener('click', (e) => {
+					e.stopPropagation()
+					copyTodoCard(todo.id, category)
+				})
+
 				const editButton = li.querySelector('.edit-todo-btn')
-				editButton.addEventListener('click', () => {
-					window.openEditModal(todo, category)
+				editButton.addEventListener('click', (e) => {
+					e.stopPropagation()
+					openEditModal(todo, category)
 				})
 
 				const deleteButton = li.querySelector('.delete-todo-btn')
-				deleteButton.addEventListener('click', () => {
-					window.deleteTodo(todo.id, category)
+				deleteButton.addEventListener('click', (e) => {
+					e.stopPropagation()
+					openDeleteModal(todo.id, category)
 				})
 
 				todoList.appendChild(li)
@@ -1027,4 +1041,156 @@ async function renderCalendar() {
 	}
 
 	calendarDays.innerHTML = calendarHTML
+}
+
+// Kart kopyalama fonksiyonu
+async function copyTodoCard(id, category) {
+	try {
+		await db.copyTodo(id, category)
+		await loadTodos()
+		sendNotification('Başarılı', 'Kart başarıyla kopyalandı')
+	} catch (error) {
+		console.error('Kart kopyalama hatası:', error)
+		sendNotification('Hata', 'Kart kopyalanırken bir hata oluştu')
+	}
+}
+
+// Todo kartını oluşturan fonksiyonu güncelle
+function createTodoCard(todo, category) {
+	const todoElement = document.createElement('div')
+	todoElement.className =
+		'bg-white p-4 rounded-lg shadow space-y-2 cursor-pointer hover:shadow-md transition-shadow'
+	todoElement.setAttribute('draggable', 'true')
+	todoElement.setAttribute('data-id', todo.id)
+
+	// Sürükle-bırak olaylarını ekle
+	todoElement.addEventListener('dragstart', (e) =>
+		handleDragStart(e, todo.id, category)
+	)
+	todoElement.addEventListener('dragend', handleDragEnd)
+
+	// Detay modalını açmak için tıklama olayı
+	todoElement.addEventListener('click', () =>
+		openDetailModal(todo, category)
+	)
+
+	// Başlık ve açıklama bölümü
+	const contentHTML = `
+		<div class="space-y-2">
+			<div class="flex items-start justify-between">
+				<h3 class="text-lg font-semibold text-gray-900 flex-grow ${
+					todo.completed ? 'line-through text-gray-500' : ''
+				}">${todo.title}</h3>
+				<div class="flex space-x-2 ml-2">
+					<button class="text-gray-600 hover:text-indigo-600" title="Detayları Göster">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+						</svg>
+					</button>
+					<button class="text-gray-600 hover:text-indigo-600" title="Kartı Kopyala">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+						</svg>
+					</button>
+					<button class="text-gray-600 hover:text-yellow-600" title="Düzenle">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+						</svg>
+					</button>
+					<button class="text-gray-600 hover:text-red-600" title="Sil">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
+			${
+				todo.description
+					? `<p class="text-sm text-gray-600 ${
+							todo.completed ? 'line-through' : ''
+					  }">${todo.description}</p>`
+					: ''
+			}
+		</div>
+	`
+
+	todoElement.innerHTML = contentHTML
+
+	// Buton olaylarını ekle
+	const buttons = todoElement.querySelectorAll('button')
+
+	// Detay butonu
+	buttons[0].onclick = (e) => {
+		e.stopPropagation()
+		openDetailModal(todo, category)
+	}
+
+	// Kopyalama butonu
+	buttons[1].onclick = (e) => {
+		e.stopPropagation()
+		copyTodoCard(todo.id, category)
+	}
+
+	// Düzenleme butonu
+	buttons[2].onclick = (e) => {
+		e.stopPropagation()
+		openEditModal(todo, category)
+	}
+
+	// Silme butonu
+	buttons[3].onclick = (e) => {
+		e.stopPropagation()
+		openDeleteModal(todo.id, category)
+	}
+
+	// Alt bilgiler (etiketler, öncelik, tarih)
+	const metaSection = document.createElement('div')
+	metaSection.className =
+		'flex flex-wrap items-center justify-between text-sm'
+
+	// Etiketler ve öncelik
+	const tagsAndPriority = document.createElement('div')
+	tagsAndPriority.className = 'flex items-center space-x-2'
+
+	// Öncelik etiketi
+	const priorityBadge = document.createElement('span')
+	priorityBadge.className = `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+		priorityColors[todo.priority].bg
+	} ${priorityColors[todo.priority].text}`
+	priorityBadge.textContent = priorityColors[todo.priority].label
+	tagsAndPriority.appendChild(priorityBadge)
+
+	// Etiketler
+	if (todo.tags && todo.tags.length > 0) {
+		const tagsContainer = document.createElement('div')
+		tagsContainer.className = 'flex items-center space-x-1'
+		todo.tags.forEach((tag) => {
+			const tagElement = document.createElement('span')
+			tagElement.className =
+				'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800'
+			tagElement.textContent = tag
+			tagsContainer.appendChild(tagElement)
+		})
+		tagsAndPriority.appendChild(tagsContainer)
+	}
+
+	metaSection.appendChild(tagsAndPriority)
+
+	// Tarih bilgisi
+	if (todo.dueDate) {
+		const dateInfo = document.createElement('div')
+		dateInfo.className = 'text-gray-500 text-sm'
+		const dueDate = new Date(todo.dueDate)
+		dateInfo.textContent = dueDate.toLocaleDateString('tr-TR', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
+		})
+		metaSection.appendChild(dateInfo)
+	}
+
+	todoElement.appendChild(metaSection)
+
+	return todoElement
 }

@@ -361,6 +361,31 @@ async function unarchiveTodo(id) {
 	}
 }
 
+async function copyTodo(id, sourceCategory) {
+	try {
+		const data = await readTodosFile()
+		const sourceTodo = data[sourceCategory].find((t) => t.id === id)
+
+		if (sourceTodo) {
+			const copiedTodo = {
+				...sourceTodo,
+				id: Date.now(),
+				title: `${sourceTodo.title} (Kopya)`,
+				created_at: getTurkeyTime(),
+				completed: false,
+				completed_at: null
+			}
+
+			await addTodo(copiedTodo, sourceCategory)
+			return copiedTodo.id
+		}
+		return null
+	} catch (error) {
+		console.error('Todo kopyalama hatası:', error)
+		throw error
+	}
+}
+
 module.exports = {
 	initDatabase,
 	addTodo,
@@ -374,5 +399,6 @@ module.exports = {
 	updatePriorities,
 	calculatePriority,
 	archiveTodo,
-	unarchiveTodo
+	unarchiveTodo,
+	copyTodo
 }
