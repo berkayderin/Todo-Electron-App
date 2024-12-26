@@ -1,5 +1,5 @@
 {
-	"name": "todo-electronjs",
+	"name": "deep-todo",
 	"version": "1.0.0",
 	"description": "Electron.js ile geliştirilmiş Todo uygulaması",
 	"author": {
@@ -7,6 +7,7 @@
 		"email": "derinberkay67@gmail.com"
 	},
 	"main": "main.js",
+	"productName": "Deep-Todo",
 	"scripts": {
 		"start": "electron .",
 		"watch": "npx tailwindcss -i ./src/input.css -o ./src/output.css --watch",
@@ -32,7 +33,27 @@
 						"x64"
 					]
 				}
-			]
-		}
+			],
+			"icon": "src/assets/icon.ico",
+			"executableName": "Deep-Todo",
+			"requestedExecutionLevel": "asInvoker",
+			"artifactName": "${productName}-${version}.${ext}",
+			"signAndEditExecutable": true,
+			"publisherName": "Berkay Derin"
+		},
+		"files": [
+			"**/*",
+			"!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+			"!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+			"!**/node_modules/*.d.ts",
+			"!**/node_modules/.bin",
+			"!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+			"!.editorconfig",
+			"!**/._*",
+			"!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+			"!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+			"!**/{appveyor.yml,.travis.yml,circle.yml}",
+			"!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+		]
 	}
 }

@@ -1,8 +1,13 @@
 const fs = require('fs').promises
 const path = require('path')
+const { app } = require('electron')
 
-const todosPath = path.join(__dirname, 'todos.json')
-const backupDir = path.join(__dirname, 'backups')
+// Uygulama veri dizinini kullan
+const userDataPath = app
+	? app.getPath('userData')
+	: process.env.APPDATA
+const todosPath = path.join(userDataPath, 'todos.json')
+const backupDir = path.join(userDataPath, 'backups')
 
 async function readTodosFile() {
 	try {

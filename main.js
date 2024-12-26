@@ -7,12 +7,17 @@ const {
 } = require('electron')
 const path = require('path')
 
+// Renderer process'te app modülünü kullanabilmek için
+app.allowRendererProcessReuse = true
+
 // Bildirim gönderme fonksiyonu
 function showNotification(title, body) {
 	new Notification({
-		title: title,
+		title: 'Deep Todo - ' + title,
 		body: body,
-		icon: path.join(__dirname, 'src/assets/notification-icon.png') // İsteğe bağlı
+		icon: path.join(__dirname, 'src/assets/notification-icon.png'),
+		silent: false,
+		timeoutType: 'default'
 	}).show()
 }
 
