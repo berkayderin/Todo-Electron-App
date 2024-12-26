@@ -466,9 +466,18 @@ async function loadTodos() {
 										: 'bg-gray-100 text-gray-600'
 								} rounded-full ml-auto">
 									<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										${
+											new Date(todo.dueDate) < new Date()
+												? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />`
+												: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`
+										}
 									</svg>
 									${new Date(todo.dueDate).toLocaleDateString('tr-TR')}
+									${
+										new Date(todo.dueDate) < new Date()
+											? `<span class="ml-1 font-medium">(Zamanı geçti)</span>`
+											: ''
+									}
 								</span>
 							`
 									: ''
@@ -836,9 +845,18 @@ function openDetailModal(todo, category) {
 								: 'text-gray-600'
 						}">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								${
+									new Date(todo.dueDate) < new Date()
+										? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />`
+										: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`
+								}
 							</svg>
 							<span>${new Date(todo.dueDate).toLocaleDateString('tr-TR')}</span>
+							${
+								new Date(todo.dueDate) < new Date()
+									? `<span class="font-medium">(Zamanı geçti)</span>`
+									: ''
+							}
 						</div>
 					</div>
 				`
@@ -849,21 +867,21 @@ function openDetailModal(todo, category) {
 			${
 				todo.tags && todo.tags.length > 0
 					? `
-				<div>
-					<h3 class="text-lg font-medium text-gray-900 mb-2">Etiketler</h3>
-					<div class="flex flex-wrap gap-2">
-						${todo.tags
-							.map(
-								(tag) => `
-							<span class="px-3 py-1 text-sm font-medium bg-blue-50 text-blue-600 rounded-full">
-								${tag}
-							</span>
-						`
-							)
-							.join('')}
+					<div>
+						<h3 class="text-lg font-medium text-gray-900 mb-2">Etiketler</h3>
+						<div class="flex flex-wrap gap-2">
+							${todo.tags
+								.map(
+									(tag) => `
+								<span class="px-3 py-1 text-sm font-medium bg-blue-50 text-blue-600 rounded-full">
+									${tag}
+								</span>
+							`
+								)
+								.join('')}
+						</div>
 					</div>
-				</div>
-			`
+				`
 					: ''
 			}
 
