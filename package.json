@@ -1,16 +1,38 @@
 {
-  "name": "todo-electronjs",
-  "version": "1.0.0",
-  "description": "Electron.js ile geliştirilmiş Todo uygulaması",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "watch": "npx tailwindcss -i ./src/input.css -o ./src/output.css --watch"
-  },
-  "dependencies": {
-    "electron": "^28.0.0"
-  },
-  "devDependencies": {
-    "tailwindcss": "^3.3.6"
-  }
-} 
+	"name": "todo-electronjs",
+	"version": "1.0.0",
+	"description": "Electron.js ile geliştirilmiş Todo uygulaması",
+	"author": {
+		"name": "Berkay Derin",
+		"email": "derinberkay67@gmail.com"
+	},
+	"main": "main.js",
+	"scripts": {
+		"start": "electron .",
+		"watch": "npx tailwindcss -i ./src/input.css -o ./src/output.css --watch",
+		"pack": "electron-builder --dir",
+		"dist": "electron-builder"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"electron": "^28.0.0",
+		"electron-builder": "^24.13.3",
+		"tailwindcss": "^3.3.6"
+	},
+	"build": {
+		"asar": false,
+		"directories": {
+			"output": "release"
+		},
+		"win": {
+			"target": [
+				{
+					"target": "portable",
+					"arch": [
+						"x64"
+					]
+				}
+			]
+		}
+	}
+}
