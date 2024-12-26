@@ -919,7 +919,7 @@ async function renderCalendar() {
 	const month = currentDate.getMonth()
 	const firstDay = new Date(year, month, 1)
 	const lastDay = new Date(year, month + 1, 0)
-	const startingDay = firstDay.getDay() || 7 // Pazartesi 1, Pazar 7 olacak şekilde
+	const startingDay = firstDay.getDay() || 7
 	const totalDays = lastDay.getDate()
 
 	currentMonthElement.textContent = new Date(
@@ -932,7 +932,12 @@ async function renderCalendar() {
 
 	// Tüm todoları al
 	const todos = await db.getTodos()
-	const allTodos = Object.values(todos).flat()
+	// Arşivlenmiş görevleri hariç tut, sadece aktif kategorilerdeki görevleri al
+	const allTodos = Object.entries(todos)
+		.filter(([category]) =>
+			['todo', 'inprogress', 'done'].includes(category)
+		)
+		.flatMap(([_, todos]) => todos)
 
 	let calendarHTML = ''
 
