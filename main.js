@@ -25,6 +25,7 @@ function createWindow() {
 	const win = new BrowserWindow({
 		width: 1920,
 		height: 1080,
+		icon: path.join(__dirname, 'src/assets/icon.ico'),
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,

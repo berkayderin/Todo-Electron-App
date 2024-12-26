@@ -28,7 +28,7 @@
 		"win": {
 			"target": [
 				{
-					"target": "portable",
+					"target": "nsis",
 					"arch": [
 						"x64"
 					]
@@ -40,6 +40,14 @@
 			"artifactName": "${productName}-${version}.${ext}",
 			"signAndEditExecutable": true,
 			"publisherName": "Berkay Derin"
+		},
+		"nsis": {
+			"oneClick": false,
+			"perMachine": false,
+			"allowToChangeInstallationDirectory": true,
+			"deleteAppDataOnUninstall": true,
+			"createDesktopShortcut": true,
+			"createStartMenuShortcut": true
 		},
 		"files": [
 			"**/*",
