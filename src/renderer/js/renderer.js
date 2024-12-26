@@ -133,14 +133,21 @@ function handleDragStart(e, todoId, category) {
 	draggedItem = Number(todoId)
 	draggedCategory = category
 	e.target.classList.add('opacity-50')
-	e.dataTransfer.setData(
-		'application/json',
-		JSON.stringify({
-			id: todoId,
-			category: category
-		})
-	)
-	e.dataTransfer.effectAllowed = 'move'
+
+	const dragData = {
+		id: todoId,
+		category: category
+	}
+
+	try {
+		e.dataTransfer.setData(
+			'application/json',
+			JSON.stringify(dragData)
+		)
+		e.dataTransfer.effectAllowed = 'move'
+	} catch (error) {
+		console.error('Sürükleme başlatılırken hata:', error)
+	}
 }
 
 function handleDragEnd(e) {
@@ -185,11 +192,17 @@ async function handleDrop(e, targetCategory) {
 	}
 
 	try {
-		const dragData = JSON.parse(
-			e.dataTransfer.getData('application/json')
-		)
-		const sourceCategory = dragData.category
-		const todoId = Number(dragData.id)
+		const dragData = e.dataTransfer.getData('application/json')
+		if (!dragData) {
+			console.error('Sürüklenen veri bulunamadı')
+			return
+		}
+
+		const { id, category: sourceCategory } = JSON.parse(dragData)
+		if (!id || !sourceCategory) {
+			console.error('Geçersiz sürükleme verisi:', dragData)
+			return
+		}
 
 		if (sourceCategory && sourceCategory !== targetCategory) {
 			// Önce tüm todoları al
@@ -202,14 +215,14 @@ async function handleDrop(e, targetCategory) {
 				return
 			}
 
-			const todoToMove = sourceList.find((t) => t.id === todoId)
+			const todoToMove = sourceList.find((t) => t.id === Number(id))
 			if (!todoToMove) {
-				console.error('Taşınacak todo bulunamadı:', todoId)
+				console.error('Taşınacak todo bulunamadı:', id)
 				return
 			}
 
 			// Todo'yu kaynaktan sil
-			await db.deleteTodo(todoId, sourceCategory)
+			await db.deleteTodo(Number(id), sourceCategory)
 
 			// Todo'yu hedef listeye ekle
 			await db.addTodo(todoToMove, targetCategory)
@@ -1002,6 +1015,13 @@ function createTodoCard(todo, category) {
 	li.className =
 		'bg-white dark:bg-gray-700/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200'
 	li.setAttribute('data-id', todo.id)
+	li.setAttribute('draggable', 'true')
+
+	// Drag event'lerini ekle
+	li.addEventListener('dragstart', (e) =>
+		handleDragStart(e, todo.id, category)
+	)
+	li.addEventListener('dragend', handleDragEnd)
 
 	const header = document.createElement('div')
 	header.className = 'flex items-center justify-between mb-3'
@@ -1120,54 +1140,3 @@ function createTodoCard(todo, category) {
 
 	return li
 }
-
-// Tema değiştirme işlemleri
-const themeToggleBtn = document.getElementById('themeToggleBtn')
-const lightIcon = document.getElementById('lightIcon')
-const darkIcon = document.getElementById('darkIcon')
-const html = document.documentElement
-
-// Tema tercihini localStorage'dan al
-let isDarkMode = localStorage.getItem('darkMode') === 'true'
-
-// Tema sınıflarını güncelle
-function updateTheme() {
-	if (isDarkMode) {
-		html.classList.add('dark')
-		lightIcon.classList.remove('hidden')
-		darkIcon.classList.add('hidden')
-		document.body.classList.remove(
-			'bg-gradient-to-br',
-			'from-blue-600',
-			'to-blue-700'
-		)
-		document.body.classList.add(
-			'bg-gradient-to-br',
-			'from-gray-800',
-			'to-gray-900'
-		)
-	} else {
-		html.classList.remove('dark')
-		lightIcon.classList.add('hidden')
-		darkIcon.classList.remove('hidden')
-		document.body.classList.remove(
-			'bg-gradient-to-br',
-			'from-gray-800',
-			'to-gray-900'
-		)
-		document.body.classList.add(
-			'bg-gradient-to-br',
-			'from-blue-600',
-			'to-blue-700'
-		)
-	}
-}
-// Sayfa yüklendiğinde temayı uygula
-updateTheme()
-
-// Tema değiştirme butonuna tıklandığında
-themeToggleBtn.addEventListener('click', () => {
-	isDarkMode = !isDarkMode
-	localStorage.setItem('darkMode', isDarkMode)
-	updateTheme()
-})
