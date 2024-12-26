@@ -71,8 +71,8 @@ async function addTodo(todoData, category) {
 			dueDate: todoData.dueDate,
 			tags: todoData.tags || [],
 			completed: todoData.completed || false,
-			created_at: getCurrentDateTime(),
-			completed_at: todoData.completed ? getCurrentDateTime() : null,
+			created_at: todoData.created_at || getCurrentDateTime(),
+			completed_at: todoData.completed_at || null,
 			notes: todoData.notes || ''
 		}
 

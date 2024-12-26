@@ -224,7 +224,7 @@ async function handleDrop(e, targetCategory) {
 			// Todo'yu kaynaktan sil
 			await db.deleteTodo(Number(id), sourceCategory)
 
-			// Todo'yu hedef listeye ekle
+			// Todo'yu hedef listeye ekle (completed durumunu değiştirmeden)
 			await db.addTodo(todoToMove, targetCategory)
 
 			// Arayüzü güncelle
@@ -1033,7 +1033,7 @@ function createTodoCard(todo, category) {
 	checkbox.type = 'checkbox'
 	checkbox.className =
 		'h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer dark:border-gray-600 dark:bg-gray-800'
-	checkbox.checked = category === 'done'
+	checkbox.checked = todo.completed
 	checkbox.classList.add('todo-checkbox')
 
 	const title = document.createElement('h3')
