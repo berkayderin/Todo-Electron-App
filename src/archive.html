@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; 
+                style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                font-src 'self' https://fonts.gstatic.com;
+                img-src 'self' data: https:;
+                script-src 'self'"
+		/>
+		<title>Arşiv - Todo Uygulaması</title>
+		<link href="output.css" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			/* Öncelik renkleri */
+			.bg-emerald-50 {
+				background-color: #ecfdf5;
+			}
+			.text-emerald-700 {
+				color: #047857;
+			}
+			.bg-amber-50 {
+				background-color: #fffbeb;
+			}
+			.text-amber-700 {
+				color: #b45309;
+			}
+			.bg-rose-50 {
+				background-color: #fff1f2;
+			}
+			.text-rose-700 {
+				color: #be123c;
+			}
+
+			/* Saydamlık sınıfları */
+			.bg-white\/95 {
+				background-color: rgba(255, 255, 255, 0.95);
+			}
+			.bg-white\/10 {
+				background-color: rgba(255, 255, 255, 0.1);
+			}
+		</style>
+	</head>
+	<body
+		class="bg-gradient-to-br from-blue-600 to-blue-700 min-h-screen font-['Plus_Jakarta_Sans']"
+	>
+		<div class="py-6 px-6">
+			<div class="max-w-7xl mx-auto">
+				<div class="flex items-center justify-between mb-8">
+					<div class="flex items-center space-x-4">
+						<a
+							href="index.html"
+							class="text-white/80 hover:text-white"
+						>
+							<svg
+								class="w-6 h-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 19l-7-7m0 0l7-7m-7 7h18"
+								/>
+							</svg>
+						</a>
+						<h1 class="text-2xl font-semibold text-white">
+							Arşivlenmiş Görevler
+						</h1>
+					</div>
+				</div>
+
+				<div class="bg-white/10 backdrop-blur-lg rounded-xl p-6">
+					<div id="archived-todos" class="space-y-4">
+						<!-- Arşivlenmiş görevler buraya yüklenecek -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="archive.js"></script>
+	</body>
+</html>

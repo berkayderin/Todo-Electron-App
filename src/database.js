@@ -87,10 +87,17 @@ async function updateTodo(id, updates, category) {
 
 		if (todoIndex !== -1) {
 			const todo = data[category][todoIndex]
+
+			// Eğer todo tamamlandıysa arşive taşı
+			if (updates.completed && !todo.completed) {
+				return await archiveTodo(id, category)
+			}
+
+			// Normal güncelleme işlemi
 			const updatedTodo = {
 				...todo,
 				...updates,
-				id: todo.id, // ID'nin değişmemesini sağla
+				id: todo.id,
 				completed:
 					updates.completed !== undefined
 						? updates.completed
@@ -102,8 +109,9 @@ async function updateTodo(id, updates, category) {
 
 			data[category][todoIndex] = updatedTodo
 			await writeTodosFile(data)
-			console.log('Todo güncellendi:', updatedTodo)
+			return true
 		}
+		return false
 	} catch (error) {
 		console.error('Todo güncelleme hatası:', error)
 		throw error
@@ -259,6 +267,75 @@ async function updatePriorities() {
 	}
 }
 
+// Arşiv fonksiyonları ekle
+async function archiveTodo(id, category) {
+	try {
+		const data = await readTodosFile()
+		const todoIndex = data[category].findIndex((t) => t.id === id)
+
+		if (todoIndex !== -1) {
+			const todo = data[category][todoIndex]
+
+			// Arşiv kategorisi yoksa oluştur
+			if (!data.archived) {
+				data.archived = []
+			}
+
+			// Todo'yu arşive taşı
+			data.archived.unshift({
+				...todo,
+				archived_at: new Date().toISOString(),
+				original_category: category
+			})
+
+			// Orijinal kategoriden kaldır
+			data[category].splice(todoIndex, 1)
+
+			await writeTodosFile(data)
+			return true
+		}
+		return false
+	} catch (error) {
+		console.error('Todo arşivleme hatası:', error)
+		throw error
+	}
+}
+
+// Arşivden geri alma fonksiyonu
+async function unarchiveTodo(id) {
+	try {
+		const data = await readTodosFile()
+		const todoIndex = data.archived.findIndex((t) => t.id === id)
+
+		if (todoIndex !== -1) {
+			const todo = data.archived[todoIndex]
+			const originalCategory = todo.original_category
+
+			// Arşivden kaldır
+			data.archived.splice(todoIndex, 1)
+
+			// Orijinal kategoriye geri ekle
+			if (!data[originalCategory]) {
+				data[originalCategory] = []
+			}
+
+			// Arşiv bilgilerini temizle
+			delete todo.archived_at
+			delete todo.original_category
+
+			// Orijinal kategoriye ekle
+			data[originalCategory].unshift(todo)
+
+			await writeTodosFile(data)
+			return true
+		}
+		return false
+	} catch (error) {
+		console.error('Arşivden geri alma hatası:', error)
+		throw error
+	}
+}
+
 module.exports = {
 	initDatabase,
 	addTodo,
@@ -270,5 +347,7 @@ module.exports = {
 	importTodos,
 	checkAndCreateBackup,
 	updatePriorities,
-	calculatePriority
+	calculatePriority,
+	archiveTodo,
+	unarchiveTodo
 }
