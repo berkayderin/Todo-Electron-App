@@ -81,16 +81,15 @@ async function loadArchivedTodos() {
 																}</h3>
                                 <div class="flex items-center space-x-2 mt-1">
                                     <span class="text-sm text-gray-500">
-                                        Tamamlanma: ${new Date(
-																					todo.completed_at ||
-																						todo.created_at
-																				).toLocaleDateString('tr-TR')}
+                                        Tamamlanma: ${
+																					todo.completed_at
+																				}
                                     </span>
                                     <span class="text-sm text-gray-500">•</span>
                                     <span class="text-sm text-gray-500">
-                                        Arşivlenme: ${new Date(
+                                        Arşivlenme: ${
 																					todo.archived_at
-																				).toLocaleDateString('tr-TR')}
+																				}
                                     </span>
                                 </div>
                             </div>

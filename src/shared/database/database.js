@@ -10,9 +10,17 @@ const todosPath = path.join(userDataPath, 'todos.json')
 const backupDir = path.join(userDataPath, 'backups')
 
 // Türkiye saat diliminde tarih oluşturma yardımcı fonksiyonu
-function getTurkeyTime() {
+function getCurrentDateTime() {
 	const now = new Date()
-	return new Date(now.getTime() + 3 * 60 * 60 * 1000).toISOString()
+	return now.toLocaleString('tr-TR', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+		hour12: false
+	})
 }
 
 async function readTodosFile() {
@@ -63,8 +71,8 @@ async function addTodo(todoData, category) {
 			dueDate: todoData.dueDate,
 			tags: todoData.tags || [],
 			completed: todoData.completed || false,
-			created_at: getTurkeyTime(),
-			completed_at: todoData.completed ? getTurkeyTime() : null,
+			created_at: getCurrentDateTime(),
+			completed_at: todoData.completed ? getCurrentDateTime() : null,
 			notes: todoData.notes || ''
 		}
 
@@ -102,11 +110,12 @@ async function updateTodo(id, updates, category) {
 
 			// Eğer todo tamamlandıysa arşive taşı
 			if (updates.completed && !todo.completed) {
+				const completedTime = getCurrentDateTime()
 				// Tamamlanma tarihini ayarla ve arşive taşı
 				const updatedTodo = {
 					...todo,
 					completed: true,
-					completed_at: getTurkeyTime()
+					completed_at: completedTime
 				}
 				data[category][todoIndex] = updatedTodo
 				return await archiveTodo(id, category)
@@ -122,7 +131,7 @@ async function updateTodo(id, updates, category) {
 						? updates.completed
 						: todo.completed,
 				completed_at: updates.completed
-					? getTurkeyTime()
+					? getCurrentDateTime()
 					: updates.completed === false
 					? null
 					: todo.completed_at
@@ -306,8 +315,8 @@ async function archiveTodo(id, category) {
 			const archivedTodo = {
 				...todo,
 				completed: true,
-				completed_at: getTurkeyTime(),
-				archived_at: getTurkeyTime(),
+				completed_at: todo.completed_at || getCurrentDateTime(),
+				archived_at: getCurrentDateTime(),
 				original_category: category
 			}
 
@@ -371,7 +380,7 @@ async function copyTodo(id, sourceCategory) {
 				...sourceTodo,
 				id: Date.now(),
 				title: `${sourceTodo.title} (Kopya)`,
-				created_at: getTurkeyTime(),
+				created_at: getCurrentDateTime(),
 				completed: false,
 				completed_at: null
 			}

@@ -638,8 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				.map((tag) => tag.trim())
 				.filter((tag) => tag),
 			notes: document.getElementById('todoNotes').value.trim(),
-			completed: false,
-			createdAt: new Date().toISOString()
+			completed: false
 		}
 
 		try {
@@ -758,9 +757,7 @@ function openDetailModal(todo, category) {
 					</div>
 					<div>
 						<h2 class="text-2xl font-semibold text-gray-900">${todo.title}</h2>
-						<p class="text-sm text-gray-500">Oluşturulma: ${new Date(
-							todo.created_at
-						).toLocaleString('tr-TR')}</p>
+						<p class="text-sm text-gray-500">Oluşturulma: ${todo.created_at}</p>
 					</div>
 				</div>
 				<span class="px-3 py-1 text-sm font-medium rounded-full ${
@@ -800,6 +797,32 @@ function openDetailModal(todo, category) {
 								: 'Tamamlandı'
 						}</span>
 					</div>
+					${
+						todo.completed_at || todo.archived_at
+							? `
+						<div class="mt-2 space-y-1">
+							${
+								todo.completed_at
+									? `
+								<div class="text-sm text-gray-500">
+									Tamamlanma: ${todo.completed_at}
+								</div>
+							`
+									: ''
+							}
+							${
+								todo.archived_at
+									? `
+								<div class="text-sm text-gray-500">
+									Arşivlenme: ${todo.archived_at}
+								</div>
+							`
+									: ''
+							}
+						</div>
+					`
+							: ''
+					}
 				</div>
 
 				${
@@ -1080,7 +1103,9 @@ function createTodoCard(todo, category) {
 			<div class="flex items-start justify-between">
 				<h3 class="text-lg font-semibold text-gray-900 flex-grow ${
 					todo.completed ? 'line-through text-gray-500' : ''
-				}">${todo.title}</h3>
+				}">
+					${todo.title}
+				</h3>
 				<div class="flex space-x-2 ml-2">
 					<button class="text-gray-600 hover:text-indigo-600" title="Detayları Göster">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
