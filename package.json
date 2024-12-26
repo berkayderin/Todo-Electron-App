@@ -6,15 +6,18 @@
 		"name": "Berkay Derin",
 		"email": "derinberkay67@gmail.com"
 	},
-	"main": "main.js",
+	"main": "src/main/main.js",
 	"productName": "Deep-Todo",
 	"scripts": {
 		"start": "electron .",
-		"watch": "npx tailwindcss -i ./src/input.css -o ./src/output.css --watch",
+		"watch": "npx tailwindcss -i ./src/renderer/styles/input.css -o ./src/renderer/styles/output.css --watch",
 		"pack": "electron-builder --dir",
 		"dist": "electron-builder"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"@tailwindcss/forms": "^0.5.7",
+		"@tailwindcss/typography": "^0.5.10"
+	},
 	"devDependencies": {
 		"electron": "^28.0.0",
 		"electron-builder": "^24.13.3",

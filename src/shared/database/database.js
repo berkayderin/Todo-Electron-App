@@ -2,12 +2,18 @@ const fs = require('fs').promises
 const path = require('path')
 const { app } = require('electron')
 
-// Uygulama veri dizinini kullan
+// Kullanıcının AppData klasöründe veritabanı dosyasını sakla
 const userDataPath = app
 	? app.getPath('userData')
 	: process.env.APPDATA
 const todosPath = path.join(userDataPath, 'todos.json')
 const backupDir = path.join(userDataPath, 'backups')
+
+// Türkiye saat diliminde tarih oluşturma yardımcı fonksiyonu
+function getTurkeyTime() {
+	const now = new Date()
+	return new Date(now.getTime() + 3 * 60 * 60 * 1000).toISOString()
+}
 
 async function readTodosFile() {
 	try {
@@ -18,7 +24,8 @@ async function readTodosFile() {
 			const initialData = {
 				todo: [],
 				inprogress: [],
-				done: []
+				done: [],
+				archived: []
 			}
 			await fs.writeFile(
 				todosPath,
@@ -56,8 +63,8 @@ async function addTodo(todoData, category) {
 			dueDate: todoData.dueDate,
 			tags: todoData.tags || [],
 			completed: todoData.completed || false,
-			created_at: todoData.created_at || new Date().toISOString(),
-			completed_at: todoData.completed_at || null,
+			created_at: getTurkeyTime(),
+			completed_at: todoData.completed ? getTurkeyTime() : null,
 			notes: todoData.notes || ''
 		}
 
@@ -95,6 +102,13 @@ async function updateTodo(id, updates, category) {
 
 			// Eğer todo tamamlandıysa arşive taşı
 			if (updates.completed && !todo.completed) {
+				// Tamamlanma tarihini ayarla ve arşive taşı
+				const updatedTodo = {
+					...todo,
+					completed: true,
+					completed_at: getTurkeyTime()
+				}
+				data[category][todoIndex] = updatedTodo
 				return await archiveTodo(id, category)
 			}
 
@@ -108,7 +122,9 @@ async function updateTodo(id, updates, category) {
 						? updates.completed
 						: todo.completed,
 				completed_at: updates.completed
-					? new Date().toISOString()
+					? getTurkeyTime()
+					: updates.completed === false
+					? null
 					: todo.completed_at
 			}
 
@@ -286,12 +302,16 @@ async function archiveTodo(id, category) {
 				data.archived = []
 			}
 
-			// Todo'yu arşive taşı
-			data.archived.unshift({
+			// Todo'yu arşive taşı ve tamamlanma bilgilerini güncelle
+			const archivedTodo = {
 				...todo,
-				archived_at: new Date().toISOString(),
+				completed: true,
+				completed_at: getTurkeyTime(),
+				archived_at: getTurkeyTime(),
 				original_category: category
-			})
+			}
+
+			data.archived.unshift(archivedTodo)
 
 			// Orijinal kategoriden kaldır
 			data[category].splice(todoIndex, 1)

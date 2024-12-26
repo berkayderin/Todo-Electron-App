@@ -1,4 +1,5 @@
-const db = require('./database')
+const db = require('../../shared/database/database')
+const { ipcRenderer } = require('electron')
 
 // Öncelik renklerini belirle
 const priorityColors = {
@@ -36,8 +37,7 @@ async function unarchiveTodo(id) {
 
 // Bildirim fonksiyonu
 function sendNotification(title, body) {
-	const notification = new Notification(title, { body })
-	setTimeout(() => notification.close(), 3000)
+	ipcRenderer.send('show-notification', { title, body })
 }
 
 async function loadArchivedTodos() {
@@ -82,7 +82,8 @@ async function loadArchivedTodos() {
                                 <div class="flex items-center space-x-2 mt-1">
                                     <span class="text-sm text-gray-500">
                                         Tamamlanma: ${new Date(
-																					todo.completed_at
+																					todo.completed_at ||
+																						todo.created_at
 																				).toLocaleDateString('tr-TR')}
                                     </span>
                                     <span class="text-sm text-gray-500">•</span>

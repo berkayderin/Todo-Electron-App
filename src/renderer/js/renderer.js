@@ -1,4 +1,4 @@
-const db = require('./database')
+const db = require('../../shared/database/database')
 const { ipcRenderer } = require('electron')
 
 // Veritabanını başlat
@@ -610,35 +610,32 @@ document.addEventListener('DOMContentLoaded', () => {
 	todoModalForm.addEventListener('submit', async (e) => {
 		e.preventDefault()
 		const category = todoCategory.value
-		const dueDate = document.getElementById('todoDueDate').value
-
 		const todoData = {
+			id: Date.now(),
 			title: document.getElementById('todoTitle').value.trim(),
 			description: document
 				.getElementById('todoDescription')
 				.value.trim(),
-			priority: dueDate
-				? db.calculatePriority(dueDate)
-				: document.getElementById('todoPriority').value,
-			dueDate: dueDate,
+			priority: document.getElementById('todoPriority').value,
+			dueDate: document.getElementById('todoDueDate').value,
 			tags: document
 				.getElementById('todoTags')
 				.value.split(',')
 				.map((tag) => tag.trim())
 				.filter((tag) => tag),
-			notes: document.getElementById('todoNotes').value.trim()
+			notes: document.getElementById('todoNotes').value.trim(),
+			completed: false,
+			createdAt: new Date().toISOString()
 		}
 
 		try {
 			await db.addTodo(todoData, category)
-			sendNotification(
-				'Yeni Görev Eklendi',
-				`"${todoData.title}" görevi başarıyla eklendi.`
-			)
 			closeTodoModal()
 			loadTodos()
+			sendNotification('Başarılı', 'Yeni kart başarıyla eklendi.')
 		} catch (error) {
 			console.error('Todo eklenirken hata:', error)
+			sendNotification('Hata', 'Kart eklenirken bir hata oluştu.')
 		}
 	})
 
@@ -707,6 +704,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Periyodik kontrol başlat
 	setInterval(checkAndUpdatePriorities, PRIORITY_UPDATE_INTERVAL)
+
+	// Yeni kart ekleme butonlarını dinle
+	document.querySelectorAll('.add-todo-btn').forEach((btn) => {
+		btn.addEventListener('click', () => {
+			const category = btn.dataset.category
+			openTodoModal(category)
+		})
+	})
+
+	// Modal kapatma butonlarını dinle
+	document.querySelectorAll('.close-todo-modal').forEach((btn) => {
+		btn.addEventListener('click', closeTodoModal)
+	})
 })
 
 // Global deleteTodo fonksiyonunu güncelle
