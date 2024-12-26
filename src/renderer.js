@@ -65,6 +65,16 @@ const detailModal = document.getElementById('detailModal')
 const detailModalContent = detailModal.querySelector('.relative')
 const detailModalOverlay = detailModal.querySelector('.absolute')
 
+// Takvim değişkenleri
+const calendarModal = document.getElementById('calendarModal')
+const calendarModalContent = calendarModal.querySelector('.relative')
+const calendarModalOverlay = calendarModal.querySelector('.absolute')
+const calendarDays = document.getElementById('calendar-days')
+const currentMonthElement = document.getElementById('currentMonth')
+const prevMonthButton = document.getElementById('prevMonth')
+const nextMonthButton = document.getElementById('nextMonth')
+let currentDate = new Date()
+
 // Modal işlemleri
 function openTodoModal(category) {
 	todoCategory.value = category
@@ -644,6 +654,35 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (importTodosBtn) {
 		importTodosBtn.addEventListener('click', importTodosFromFile)
 	}
+
+	const calendarBtn = document.getElementById('calendarBtn')
+	const closeCalendarBtn = calendarModal.querySelector(
+		'.close-calendar-modal'
+	)
+
+	calendarBtn.addEventListener('click', openCalendarModal)
+	closeCalendarBtn.addEventListener('click', closeCalendarModal)
+	calendarModalOverlay.addEventListener('click', closeCalendarModal)
+
+	prevMonthButton.addEventListener('click', () => {
+		currentDate.setMonth(currentDate.getMonth() - 1)
+		renderCalendar()
+	})
+
+	nextMonthButton.addEventListener('click', () => {
+		currentDate.setMonth(currentDate.getMonth() + 1)
+		renderCalendar()
+	})
+
+	// ESC tuşu ile kapatma
+	document.addEventListener('keydown', (e) => {
+		if (
+			e.key === 'Escape' &&
+			!calendarModal.classList.contains('invisible')
+		) {
+			closeCalendarModal()
+		}
+	})
 })
 
 // Global deleteTodo fonksiyonunu güncelle
@@ -831,4 +870,122 @@ async function startAutoBackup() {
 	await db.checkAndCreateBackup()
 	// Her 24 saatte bir yedekleme kontrolü yap
 	setInterval(db.checkAndCreateBackup, 24 * 60 * 60 * 1000)
+}
+
+// Takvim fonksiyonları
+function openCalendarModal() {
+	calendarModal.classList.remove('invisible', 'opacity-0')
+	calendarModalOverlay.classList.add('opacity-50')
+	calendarModalContent.classList.remove('scale-95', 'opacity-0')
+	calendarModalContent.classList.add('scale-100', 'opacity-100')
+	renderCalendar()
+}
+
+function closeCalendarModal() {
+	calendarModalContent.classList.remove('scale-100', 'opacity-100')
+	calendarModalContent.classList.add('scale-95', 'opacity-0')
+	calendarModalOverlay.classList.remove('opacity-50')
+	setTimeout(() => {
+		calendarModal.classList.add('invisible', 'opacity-0')
+	}, 300)
+}
+
+async function renderCalendar() {
+	const year = currentDate.getFullYear()
+	const month = currentDate.getMonth()
+	const firstDay = new Date(year, month, 1)
+	const lastDay = new Date(year, month + 1, 0)
+	const startingDay = firstDay.getDay() || 7 // Pazartesi 1, Pazar 7 olacak şekilde
+	const totalDays = lastDay.getDate()
+
+	currentMonthElement.textContent = new Date(
+		year,
+		month
+	).toLocaleDateString('tr-TR', {
+		month: 'long',
+		year: 'numeric'
+	})
+
+	// Tüm todoları al
+	const todos = await db.getTodos()
+	const allTodos = Object.values(todos).flat()
+
+	let calendarHTML = ''
+
+	// Boş günler için
+	for (let i = 1; i < startingDay; i++) {
+		calendarHTML += `<div class="bg-white p-2 min-h-[100px]"></div>`
+	}
+
+	// Ayın günleri için
+	for (let day = 1; day <= totalDays; day++) {
+		const date = new Date(year, month, day)
+		// Tarihi yerel saat dilimine göre formatla
+		const formattedDate = date
+			.toLocaleDateString('tr-TR', {
+				year: 'numeric',
+				month: '2-digit',
+				day: '2-digit'
+			})
+			.split('.')
+			.reverse()
+			.join('-')
+
+		// O güne ait todoları bul
+		const dayTodos = allTodos.filter((todo) => {
+			if (!todo.dueDate) return false
+
+			// Todo tarihini yerel saat dilimine çevir
+			const todoDueDate = new Date(todo.dueDate)
+			const formattedDueDate = todoDueDate
+				.toLocaleDateString('tr-TR', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit'
+				})
+				.split('.')
+				.reverse()
+				.join('-')
+
+			return formattedDueDate === formattedDate
+		})
+
+		const isToday =
+			new Date().toLocaleDateString() === date.toLocaleDateString()
+
+		calendarHTML += `
+			<div class="bg-white p-2 min-h-[100px] ${
+				isToday ? 'ring-2 ring-blue-500' : ''
+			}">
+				<div class="flex justify-between items-center mb-2">
+					<span class="text-sm font-medium ${
+						isToday ? 'text-blue-600' : 'text-gray-900'
+					}">${day}</span>
+					${
+						dayTodos.length > 0
+							? `<span class="text-xs font-medium text-gray-500">${dayTodos.length} görev</span>`
+							: ''
+					}
+				</div>
+				<div class="space-y-1">
+					${dayTodos
+						.map(
+							(todo) => `
+						<div class="text-xs p-1 rounded ${priorityColors[todo.priority].bg} ${
+								priorityColors[todo.priority].text
+							} truncate cursor-pointer hover:opacity-75 transition-opacity"
+							 onclick="openDetailModal(${JSON.stringify(todo)}, '${
+								todo.category
+							}')">
+							${todo.title}
+						</div>
+					`
+						)
+						.join('')}
+				</div>
+			</div>
+		`
+	}
+
+	calendarDays.innerHTML = calendarHTML
 }

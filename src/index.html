@@ -383,6 +383,131 @@
 			</div>
 		</div>
 
+		<!-- Takvim Modal -->
+		<div
+			id="calendarModal"
+			class="invisible opacity-0 fixed inset-0 flex items-center justify-center z-50"
+		>
+			<div
+				class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
+			></div>
+			<div
+				class="relative bg-white rounded-xl p-6 w-full max-w-4xl transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<div class="flex items-center space-x-4">
+						<h3 class="text-xl font-semibold text-gray-900">
+							Takvim Görünümü
+						</h3>
+						<div class="flex items-center space-x-2">
+							<button
+								id="prevMonth"
+								class="p-1.5 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+							>
+								<svg
+									class="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 19l-7-7 7-7"
+									/>
+								</svg>
+							</button>
+							<span
+								id="currentMonth"
+								class="text-lg font-medium text-gray-900"
+							></span>
+							<button
+								id="nextMonth"
+								class="p-1.5 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+							>
+								<svg
+									class="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 5l7 7-7 7"
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<button
+						class="text-gray-400 hover:text-gray-500 close-calendar-modal"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+				<div class="calendar-grid">
+					<div
+						class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden"
+					>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Pzt
+						</div>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Sal
+						</div>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Çar
+						</div>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Per
+						</div>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Cum
+						</div>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Cmt
+						</div>
+						<div
+							class="text-center py-2 bg-gray-50 text-gray-500 text-sm font-medium"
+						>
+							Paz
+						</div>
+						<div
+							id="calendar-days"
+							class="col-span-7 grid grid-cols-7 gap-px"
+						></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="min-h-screen">
 			<div class="py-6 px-6">
 				<div class="max-w-7xl mx-auto">
@@ -484,6 +609,25 @@
 										stroke-linejoin="round"
 										stroke-width="2"
 										d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
+									/>
+								</svg>
+							</button>
+							<button
+								id="calendarBtn"
+								class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200"
+								title="Takvim Görünümü"
+							>
+								<svg
+									class="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 									/>
 								</svg>
 							</button>
