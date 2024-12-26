@@ -12,7 +12,8 @@
 					style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
 					font-src 'self' https://fonts.gstatic.com;
 					img-src 'self' data: https:;
-					script-src 'self'"
+					script-src 'self';
+					navigate-to 'self' https://github.com;"
 		/>
 		<title>Todo Uygulaması</title>
 		<link href="../styles/output.css" rel="stylesheet" />
@@ -38,7 +39,7 @@
 					0 2px 4px -1px rgba(0, 0, 0, 0.06);
 			}
 
-			/* Saydamlık sınıfları */
+			/* Saydamlık s��nıfları */
 			.bg-white\/95 {
 				background-color: rgba(255, 255, 255, 0.95);
 			}
@@ -521,9 +522,8 @@
 								<span class="text-white/80 text-sm font-medium">
 									Software Engineer
 								</span>
-								<a
-									href="https://github.com/berkayderin"
-									target="_blank"
+								<button
+									id="githubButton"
 									class="text-white/80 hover:text-white transition-colors duration-200"
 								>
 									<svg
@@ -537,7 +537,7 @@
 											clip-rule="evenodd"
 										/>
 									</svg>
-								</a>
+								</button>
 							</div>
 						</div>
 						<div class="flex items-center gap-4">

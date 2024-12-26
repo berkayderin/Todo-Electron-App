@@ -1,7 +1,25 @@
-const { ipcMain, dialog, app, Notification } = require('electron')
+const {
+	ipcMain,
+	dialog,
+	app,
+	Notification,
+	shell
+} = require('electron')
 const path = require('path')
 
 // IPC olaylarını dinle
+// Github sayfasını varsayılan tarayıcıda aç
+ipcMain.on('open-github', async (event) => {
+	try {
+		await shell.openExternal(
+			'https://github.com/berkayderin/Todo-Electron-App'
+		)
+		console.log('Github sayfası açıldı')
+	} catch (error) {
+		console.error('Github sayfası açılırken hata oluştu:', error)
+	}
+})
+
 ipcMain.handle('export-todos', async () => {
 	const { filePath } = await dialog.showSaveDialog({
 		title: 'Todoları Dışa Aktar',

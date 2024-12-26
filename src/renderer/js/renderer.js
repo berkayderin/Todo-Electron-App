@@ -370,123 +370,9 @@ async function loadTodos() {
 			todoList.innerHTML = ''
 
 			todos[category].forEach((todo) => {
-				const li = document.createElement('li')
-				li.className =
-					'bg-white/95 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-5 mb-3 cursor-move'
-				li.draggable = true
+				const li = createTodoCard(todo, category)
 
-				// Sürükle-bırak olayları
-				li.addEventListener('dragstart', (e) =>
-					handleDragStart(e, todo.id, category)
-				)
-				li.addEventListener('dragend', handleDragEnd)
-
-				const priorityColor = priorityColors[todo.priority]
-
-				// Todo öğesinin HTML yapısını oluştur
-				li.innerHTML = `
-					<div class="space-y-3">
-						<div class="flex items-center justify-between">
-							<div class="flex items-center space-x-3">
-								<div class="relative">
-									<input type="checkbox" 
-										   class="todo-checkbox w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 transition-all duration-200" 
-										${todo.completed ? 'checked' : ''}>
-								</div>
-								<div>
-									<h3 class="font-medium ${
-										todo.completed
-											? 'line-through text-gray-400'
-											: 'text-gray-900'
-									} transition-all duration-200">
-										${todo.title}
-									</h3>
-									${
-										todo.description
-											? `<p class="mt-1 text-sm text-gray-500 line-clamp-2">${todo.description}</p>`
-											: ''
-									}
-								</div>
-							</div>
-							<div class="flex items-center space-x-2">
-								<span class="px-2.5 py-1 text-xs font-medium rounded-full ${
-									priorityColor.bg
-								} ${
-					priorityColor.text
-				} transition-colors duration-200">
-									${priorityColor.label}
-								</span>
-								<div class="flex items-center space-x-1">
-									<button class="view-todo-btn p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-200">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-										</svg>
-									</button>
-									<button class="copy-todo-btn p-1.5 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all duration-200">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
-										</svg>
-									</button>
-									<button class="edit-todo-btn p-1.5 text-gray-400 hover:text-yellow-600 rounded-lg hover:bg-yellow-50 transition-all duration-200">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-										</svg>
-									</button>
-									<button class="delete-todo-btn p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-										</svg>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						<div class="flex flex-wrap items-center gap-2 mt-3">
-							${
-								todo.tags && todo.tags.length > 0
-									? todo.tags
-											.map(
-												(tag) => `
-								<span class="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded-full">
-									${tag}
-								</span>
-							`
-											)
-											.join('')
-									: ''
-							}
-							
-							${
-								todo.dueDate
-									? `
-								<span class="flex items-center px-2.5 py-1 text-xs font-medium ${
-									new Date(todo.dueDate) < new Date()
-										? 'bg-red-50 text-red-600'
-										: 'bg-gray-100 text-gray-600'
-								} rounded-full ml-auto">
-									<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										${
-											new Date(todo.dueDate) < new Date()
-												? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />`
-												: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`
-										}
-									</svg>
-									${new Date(todo.dueDate).toLocaleDateString('tr-TR')}
-									${
-										new Date(todo.dueDate) < new Date()
-											? `<span class="ml-1 font-medium">(Zamanı geçti)</span>`
-											: ''
-									}
-								</span>
-							`
-									: ''
-							}
-						</div>
-					</div>
-				`
-
-				// Event listener'ları ekle
+				// Olay dinleyicilerini ekle
 				const checkbox = li.querySelector('.todo-checkbox')
 				checkbox.addEventListener('change', () => {
 					window.toggleTodo(todo.id, checkbox.checked, category)
@@ -739,6 +625,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.querySelectorAll('.close-todo-modal').forEach((btn) => {
 		btn.addEventListener('click', closeTodoModal)
 	})
+
+	// Github butonu işlemleri
+	const githubButton = document.getElementById('githubButton')
+	if (githubButton) {
+		githubButton.addEventListener('click', (e) => {
+			e.preventDefault()
+			e.stopPropagation()
+			ipcRenderer.send('open-github')
+		})
+	}
 })
 
 // Global deleteTodo fonksiyonunu güncelle
@@ -765,8 +661,12 @@ function openDetailModal(todo, category) {
 						</span>
 					</div>
 					<div>
-						<h2 class="text-2xl font-semibold text-gray-900">${todo.title}</h2>
-						<p class="text-sm text-gray-500">Oluşturulma: ${todo.created_at}</p>
+						<h2 class="text-2xl font-semibold text-gray-900 dark:text-white">${
+							todo.title
+						}</h2>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Oluşturulma: ${
+							todo.created_at
+						}</p>
 					</div>
 				</div>
 				<span class="px-3 py-1 text-sm font-medium rounded-full ${
@@ -780,8 +680,8 @@ function openDetailModal(todo, category) {
 				todo.description
 					? `
 				<div class="prose prose-blue max-w-none">
-					<h3 class="text-lg font-medium text-gray-900">Açıklama</h3>
-					<p class="text-gray-600">${todo.description}</p>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">Açıklama</h3>
+					<p class="text-gray-600 dark:text-gray-300">${todo.description}</p>
 				</div>
 			`
 					: ''
@@ -789,7 +689,7 @@ function openDetailModal(todo, category) {
 
 			<div class="grid grid-cols-2 gap-6">
 				<div>
-					<h3 class="text-lg font-medium text-gray-900 mb-2">Durum</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Durum</h3>
 					<div class="flex items-center space-x-2">
 						<span class="flex-shrink-0 w-2.5 h-2.5 rounded-full ${
 							category === 'todo'
@@ -798,7 +698,7 @@ function openDetailModal(todo, category) {
 								? 'bg-yellow-400'
 								: 'bg-green-400'
 						}"></span>
-						<span class="text-gray-600">${
+						<span class="text-gray-600 dark:text-gray-300">${
 							category === 'todo'
 								? 'Yapılacak'
 								: category === 'inprogress'
@@ -813,7 +713,7 @@ function openDetailModal(todo, category) {
 							${
 								todo.completed_at
 									? `
-								<div class="text-sm text-gray-500">
+								<div class="text-sm text-gray-500 dark:text-gray-400">
 									Tamamlanma: ${todo.completed_at}
 								</div>
 							`
@@ -822,7 +722,7 @@ function openDetailModal(todo, category) {
 							${
 								todo.archived_at
 									? `
-								<div class="text-sm text-gray-500">
+								<div class="text-sm text-gray-500 dark:text-gray-400">
 									Arşivlenme: ${todo.archived_at}
 								</div>
 							`
@@ -838,11 +738,11 @@ function openDetailModal(todo, category) {
 					todo.dueDate
 						? `
 					<div>
-						<h3 class="text-lg font-medium text-gray-900 mb-2">Bitiş Tarihi</h3>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Bitiş Tarihi</h3>
 						<div class="flex items-center space-x-2 ${
 							new Date(todo.dueDate) < new Date()
-								? 'text-red-600'
-								: 'text-gray-600'
+								? 'text-red-600 dark:text-red-400'
+								: 'text-gray-600 dark:text-gray-300'
 						}">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								${
@@ -868,12 +768,12 @@ function openDetailModal(todo, category) {
 				todo.tags && todo.tags.length > 0
 					? `
 					<div>
-						<h3 class="text-lg font-medium text-gray-900 mb-2">Etiketler</h3>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Etiketler</h3>
 						<div class="flex flex-wrap gap-2">
 							${todo.tags
 								.map(
 									(tag) => `
-								<span class="px-3 py-1 text-sm font-medium bg-blue-50 text-blue-600 rounded-full">
+								<span class="px-3 py-1 text-sm font-medium bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300 rounded-full">
 									${tag}
 								</span>
 							`
@@ -889,8 +789,8 @@ function openDetailModal(todo, category) {
 				todo.notes
 					? `
 				<div>
-					<h3 class="text-lg font-medium text-gray-900 mb-2">Notlar</h3>
-					<p class="text-gray-600 whitespace-pre-wrap">${todo.notes}</p>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Notlar</h3>
+					<p class="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">${todo.notes}</p>
 				</div>
 			`
 					: ''
@@ -1098,120 +998,103 @@ async function copyTodoCard(id, category) {
 
 // Todo kartını oluşturan fonksiyonu güncelle
 function createTodoCard(todo, category) {
-	const todoElement = document.createElement('div')
-	todoElement.className =
-		'bg-white p-4 rounded-lg shadow space-y-2 cursor-pointer hover:shadow-md transition-shadow'
-	todoElement.setAttribute('draggable', 'true')
-	todoElement.setAttribute('data-id', todo.id)
+	const li = document.createElement('li')
+	li.className =
+		'bg-white dark:bg-gray-700/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200'
+	li.setAttribute('data-id', todo.id)
 
-	// Sürükle-bırak olaylarını ekle
-	todoElement.addEventListener('dragstart', (e) =>
-		handleDragStart(e, todo.id, category)
-	)
-	todoElement.addEventListener('dragend', handleDragEnd)
+	const header = document.createElement('div')
+	header.className = 'flex items-center justify-between mb-3'
 
-	// Detay modalını açmak için tıklama olayı
-	todoElement.addEventListener('click', () =>
-		openDetailModal(todo, category)
-	)
+	const titleWrapper = document.createElement('div')
+	titleWrapper.className = 'flex items-center space-x-3'
 
-	// Başlık ve açıklama bölümü
-	const contentHTML = `
-		<div class="space-y-2">
-			<div class="flex items-start justify-between">
-				<h3 class="text-lg font-semibold text-gray-900 flex-grow ${
-					todo.completed ? 'line-through text-gray-500' : ''
-				}">
-					${todo.title}
-				</h3>
-				<div class="flex space-x-2 ml-2">
-					<button class="text-gray-600 hover:text-indigo-600" title="Detayları Göster">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-						</svg>
-					</button>
-					<button class="text-gray-600 hover:text-indigo-600" title="Kartı Kopyala">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
-						</svg>
-					</button>
-					<button class="text-gray-600 hover:text-yellow-600" title="Düzenle">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-						</svg>
-					</button>
-					<button class="text-gray-600 hover:text-red-600" title="Sil">
-						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-						</svg>
-					</button>
-				</div>
-			</div>
-			${
-				todo.description
-					? `<p class="text-sm text-gray-600 ${
-							todo.completed ? 'line-through' : ''
-					  }">${todo.description}</p>`
-					: ''
-			}
-		</div>
+	const checkbox = document.createElement('input')
+	checkbox.type = 'checkbox'
+	checkbox.className =
+		'h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer dark:border-gray-600 dark:bg-gray-800'
+	checkbox.checked = category === 'done'
+	checkbox.classList.add('todo-checkbox')
+
+	const title = document.createElement('h3')
+	title.className = 'font-medium text-gray-900 dark:text-white'
+	title.textContent = todo.title
+
+	titleWrapper.appendChild(checkbox)
+	titleWrapper.appendChild(title)
+
+	const actions = document.createElement('div')
+	actions.className = 'flex items-center space-x-2'
+
+	const viewButton = document.createElement('button')
+	viewButton.className =
+		'p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 view-todo-btn'
+	viewButton.innerHTML = `
+		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+		</svg>
 	`
 
-	todoElement.innerHTML = contentHTML
+	const copyButton = document.createElement('button')
+	copyButton.className =
+		'p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 copy-todo-btn'
+	copyButton.innerHTML = `
+		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+		</svg>
+	`
 
-	// Buton olaylarını ekle
-	const buttons = todoElement.querySelectorAll('button')
+	const editButton = document.createElement('button')
+	editButton.className =
+		'p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 edit-todo-btn'
+	editButton.innerHTML = `
+		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+		</svg>
+	`
 
-	// Detay butonu
-	buttons[0].onclick = (e) => {
-		e.stopPropagation()
-		openDetailModal(todo, category)
-	}
+	const deleteButton = document.createElement('button')
+	deleteButton.className =
+		'p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 delete-todo-btn'
+	deleteButton.innerHTML = `
+		<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+		</svg>
+	`
 
-	// Kopyalama butonu
-	buttons[1].onclick = (e) => {
-		e.stopPropagation()
-		copyTodoCard(todo.id, category)
-	}
+	actions.appendChild(viewButton)
+	actions.appendChild(copyButton)
+	actions.appendChild(editButton)
+	actions.appendChild(deleteButton)
 
-	// Düzenleme butonu
-	buttons[2].onclick = (e) => {
-		e.stopPropagation()
-		openEditModal(todo, category)
-	}
+	header.appendChild(titleWrapper)
+	header.appendChild(actions)
 
-	// Silme butonu
-	buttons[3].onclick = (e) => {
-		e.stopPropagation()
-		openDeleteModal(todo.id, category)
-	}
-
-	// Alt bilgiler (etiketler, öncelik, tarih)
 	const metaSection = document.createElement('div')
-	metaSection.className =
-		'flex flex-wrap items-center justify-between text-sm'
+	metaSection.className = 'space-y-3'
 
-	// Etiketler ve öncelik
+	const description = document.createElement('p')
+	description.className = 'text-gray-600 dark:text-gray-300 text-sm'
+	description.textContent = todo.description || ''
+	metaSection.appendChild(description)
+
 	const tagsAndPriority = document.createElement('div')
-	tagsAndPriority.className = 'flex items-center space-x-2'
+	tagsAndPriority.className = 'flex items-center justify-between'
 
-	// Öncelik etiketi
 	const priorityBadge = document.createElement('span')
-	priorityBadge.className = `inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-		priorityColors[todo.priority].bg
-	} ${priorityColors[todo.priority].text}`
-	priorityBadge.textContent = priorityColors[todo.priority].label
+	const priorityColor = priorityColors[todo.priority]
+	priorityBadge.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColor.bg} ${priorityColor.text}`
+	priorityBadge.textContent = `${priorityColor.label} Öncelik`
 	tagsAndPriority.appendChild(priorityBadge)
 
-	// Etiketler
 	if (todo.tags && todo.tags.length > 0) {
 		const tagsContainer = document.createElement('div')
 		tagsContainer.className = 'flex items-center space-x-1'
 		todo.tags.forEach((tag) => {
 			const tagElement = document.createElement('span')
 			tagElement.className =
-				'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800'
+				'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
 			tagElement.textContent = tag
 			tagsContainer.appendChild(tagElement)
 		})
@@ -1220,10 +1103,9 @@ function createTodoCard(todo, category) {
 
 	metaSection.appendChild(tagsAndPriority)
 
-	// Tarih bilgisi
 	if (todo.dueDate) {
 		const dateInfo = document.createElement('div')
-		dateInfo.className = 'text-gray-500 text-sm'
+		dateInfo.className = 'text-gray-500 dark:text-gray-400 text-sm'
 		const dueDate = new Date(todo.dueDate)
 		dateInfo.textContent = dueDate.toLocaleDateString('tr-TR', {
 			year: 'numeric',
@@ -1233,7 +1115,59 @@ function createTodoCard(todo, category) {
 		metaSection.appendChild(dateInfo)
 	}
 
-	todoElement.appendChild(metaSection)
+	li.appendChild(header)
+	li.appendChild(metaSection)
 
-	return todoElement
+	return li
 }
+
+// Tema değiştirme işlemleri
+const themeToggleBtn = document.getElementById('themeToggleBtn')
+const lightIcon = document.getElementById('lightIcon')
+const darkIcon = document.getElementById('darkIcon')
+const html = document.documentElement
+
+// Tema tercihini localStorage'dan al
+let isDarkMode = localStorage.getItem('darkMode') === 'true'
+
+// Tema sınıflarını güncelle
+function updateTheme() {
+	if (isDarkMode) {
+		html.classList.add('dark')
+		lightIcon.classList.remove('hidden')
+		darkIcon.classList.add('hidden')
+		document.body.classList.remove(
+			'bg-gradient-to-br',
+			'from-blue-600',
+			'to-blue-700'
+		)
+		document.body.classList.add(
+			'bg-gradient-to-br',
+			'from-gray-800',
+			'to-gray-900'
+		)
+	} else {
+		html.classList.remove('dark')
+		lightIcon.classList.add('hidden')
+		darkIcon.classList.remove('hidden')
+		document.body.classList.remove(
+			'bg-gradient-to-br',
+			'from-gray-800',
+			'to-gray-900'
+		)
+		document.body.classList.add(
+			'bg-gradient-to-br',
+			'from-blue-600',
+			'to-blue-700'
+		)
+	}
+}
+// Sayfa yüklendiğinde temayı uygula
+updateTheme()
+
+// Tema değiştirme butonuna tıklandığında
+themeToggleBtn.addEventListener('click', () => {
+	isDarkMode = !isDarkMode
+	localStorage.setItem('darkMode', isDarkMode)
+	updateTheme()
+})
