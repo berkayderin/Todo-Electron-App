@@ -130,13 +130,22 @@
 					</div>
 					<div class="grid grid-cols-2 gap-4">
 						<div>
+							<label
+								for="todoPriority"
+								class="block text-sm font-medium text-gray-700"
+							>
+								Öncelik
+								<span class="text-xs text-gray-500 ml-1">
+									(Son tarih seçilirse otomatik belirlenir)
+								</span>
+							</label>
 							<select
 								id="todoPriority"
-								class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600 transition-all duration-200"
+								class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-xl"
 							>
-								<option value="low">Düşük Öncelik</option>
-								<option value="medium">Orta Öncelik</option>
-								<option value="high">Yüksek Öncelik</option>
+								<option value="low">Düşük</option>
+								<option value="medium">Orta</option>
+								<option value="high">Yüksek</option>
 							</select>
 						</div>
 						<div>

@@ -610,21 +610,23 @@ document.addEventListener('DOMContentLoaded', () => {
 	todoModalForm.addEventListener('submit', async (e) => {
 		e.preventDefault()
 		const category = todoCategory.value
+		const dueDate = document.getElementById('todoDueDate').value
+
 		const todoData = {
 			title: document.getElementById('todoTitle').value.trim(),
 			description: document
 				.getElementById('todoDescription')
 				.value.trim(),
-			priority: document.getElementById('todoPriority').value,
-			dueDate: document.getElementById('todoDueDate').value,
+			priority: dueDate
+				? db.calculatePriority(dueDate)
+				: document.getElementById('todoPriority').value,
+			dueDate: dueDate,
 			tags: document
 				.getElementById('todoTags')
 				.value.split(',')
 				.map((tag) => tag.trim())
 				.filter((tag) => tag),
-			notes: document.getElementById('todoNotes').value.trim(),
-			completed: false,
-			created_at: new Date().toISOString()
+			notes: document.getElementById('todoNotes').value.trim()
 		}
 
 		try {
@@ -683,6 +685,28 @@ document.addEventListener('DOMContentLoaded', () => {
 			closeCalendarModal()
 		}
 	})
+
+	// Öncelik güncelleme aralığını ayarla (her 1 saatte bir)
+	const PRIORITY_UPDATE_INTERVAL = 60 * 60 * 1000
+
+	// Otomatik öncelik güncelleme fonksiyonu
+	async function checkAndUpdatePriorities() {
+		try {
+			const updated = await db.updatePriorities()
+			if (updated) {
+				await loadTodos() // Arayüzü güncelle
+				console.log('Öncelikler güncellendi')
+			}
+		} catch (error) {
+			console.error('Öncelik kontrolü sırasında hata:', error)
+		}
+	}
+
+	// İlk öncelik kontrolünü yap
+	checkAndUpdatePriorities()
+
+	// Periyodik kontrol başlat
+	setInterval(checkAndUpdatePriorities, PRIORITY_UPDATE_INTERVAL)
 })
 
 // Global deleteTodo fonksiyonunu güncelle

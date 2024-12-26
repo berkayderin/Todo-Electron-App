@@ -45,7 +45,9 @@ async function addTodo(todoData, category) {
 			id: todoData.id || Date.now(),
 			title: todoData.title,
 			description: todoData.description,
-			priority: todoData.priority,
+			priority: todoData.dueDate
+				? calculatePriority(todoData.dueDate)
+				: todoData.priority,
 			dueDate: todoData.dueDate,
 			tags: todoData.tags || [],
 			completed: todoData.completed || false,
@@ -210,6 +212,53 @@ async function checkAndCreateBackup() {
 	}
 }
 
+// Öncelik hesaplama fonksiyonu ekle
+function calculatePriority(dueDate) {
+	if (!dueDate) return 'low'
+
+	const now = new Date()
+	const due = new Date(dueDate)
+	const diffInHours = (due - now) / (1000 * 60 * 60)
+
+	if (diffInHours <= 24) {
+		return 'high'
+	} else if (diffInHours <= 72) {
+		return 'medium'
+	} else {
+		return 'low'
+	}
+}
+
+// Otomatik öncelik güncelleme fonksiyonu
+async function updatePriorities() {
+	try {
+		const data = await readTodosFile()
+		let updated = false
+
+		for (const category in data) {
+			data[category] = data[category].map((todo) => {
+				if (todo.dueDate && !todo.completed) {
+					const newPriority = calculatePriority(todo.dueDate)
+					if (todo.priority !== newPriority) {
+						updated = true
+						return { ...todo, priority: newPriority }
+					}
+				}
+				return todo
+			})
+		}
+
+		if (updated) {
+			await writeTodosFile(data)
+			return true
+		}
+		return false
+	} catch (error) {
+		console.error('Öncelik güncelleme hatası:', error)
+		throw error
+	}
+}
+
 module.exports = {
 	initDatabase,
 	addTodo,
@@ -219,5 +268,7 @@ module.exports = {
 	createBackup,
 	exportTodos,
 	importTodos,
-	checkAndCreateBackup
+	checkAndCreateBackup,
+	updatePriorities,
+	calculatePriority
 }
