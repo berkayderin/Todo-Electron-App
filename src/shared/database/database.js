@@ -353,12 +353,17 @@ async function unarchiveTodo(id) {
 				data[originalCategory] = []
 			}
 
-			// Arşiv bilgilerini temizle
-			delete todo.archived_at
-			delete todo.original_category
+			// Arşiv ve tamamlanma bilgilerini temizle
+			const restoredTodo = {
+				...todo,
+				completed: false,
+				completed_at: null
+			}
+			delete restoredTodo.archived_at
+			delete restoredTodo.original_category
 
 			// Orijinal kategoriye ekle
-			data[originalCategory].unshift(todo)
+			data[originalCategory].unshift(restoredTodo)
 
 			await writeTodosFile(data)
 			return true
