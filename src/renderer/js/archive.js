@@ -123,7 +123,11 @@ async function loadArchivedTodos() {
 								</span>
 							</div>
 							<div>
-								<h3 class="font-medium text-gray-900">${todo.title}</h3>
+								<h3 class="font-medium text-gray-900">${
+									todo.title.length > 30
+										? todo.title.substring(0, 30) + '...'
+										: todo.title
+								}</h3>
 								<div class="flex items-center space-x-2 mt-1">
 									<span class="text-sm text-gray-500">
 										Tamamlanma: ${todo.completed_at}

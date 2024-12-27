@@ -1038,7 +1038,10 @@ function createTodoCard(todo, category) {
 
 	const title = document.createElement('h3')
 	title.className = 'font-medium text-gray-900 dark:text-white'
-	title.textContent = todo.title
+	title.textContent =
+		todo.title.length > 30
+			? todo.title.substring(0, 30) + '...'
+			: todo.title
 
 	titleWrapper.appendChild(checkbox)
 	titleWrapper.appendChild(title)
