@@ -98,10 +98,6 @@ npm run watch
 - [Tailwind CSS](https://tailwindcss.com/)
 - Node.js
 
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
-
 ## 👨‍💻 Geliştirici
 
 - **Berkay Derin** - [derinberkay67@gmail.com](mailto:derinberkay67@gmail.com)
