@@ -89,6 +89,9 @@ npm start
 npm run watch
 ```
 
+## Virüs Total
+- Virüs Total: https://www.virustotal.com/gui/file/881bbdd1e656d82ff120a41474015858b2ba8768320a125a198a01a527130aa5
+
 ## 🛠️ Teknolojiler
 
 - [Electron.js](https://www.electronjs.org/)
