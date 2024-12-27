@@ -30,6 +30,7 @@ build/
 *.app
 *.zip
 *.tar.gz
+release/
 
 # Ortam değişkenleri
 .env
