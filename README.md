@@ -1,58 +1,72 @@
-# Deep-Todo
+# Todo-Electron-App
 
 Electron.js ile geliştirilmiş, modern ve kullanıcı dostu bir Todo (Yapılacaklar Listesi) uygulaması.
 
-![Deep-Todo Logo](src/assets/icon.ico)
+![Todo-Electron-App Logo](src/assets/icon.ico)
 
-## Özellikler
+## ✨ Özellikler
 
 ### 💫 Kullanıcı Arayüzü
 
-- Tailwind CSS ile tasarlanmış modern arayüz
-- Sürükle-bırak ile todo sıralama
+- Modern ve minimalist tasarım (Tailwind CSS)
+- Sürükle-bırak ile görev yönetimi
+- Karanlık/Aydınlık mod desteği
 - Duyarlı (responsive) tasarım
+- Modal pencereler ile kolay kullanım
+- Takvim görünümü
 
-### 📝 Todo Yönetimi
+### 📝 Todo İşlemleri
 
-- Başlık ve açıklama içeren todo oluşturma
-- Todo düzenleme ve silme
-- Todo'ları tamamlandı olarak işaretleme
-- Bitiş tarihi belirleme
-- Otomatik öncelik hesaplama (Düşük, Orta, Yüksek)
-- Not ekleme özelliği
+- Yeni todo ekleme ve düzenleme
+- Başlık ve detaylı açıklama ekleme
+- Öncelik seviyesi belirleme (Düşük, Orta, Yüksek)
+- Son tarih (due date) belirleme
 - Etiketleme sistemi
+- Todo kopyalama özelliği
+- Todo'ları tamamlandı olarak işaretleme
+- Sürükle-bırak ile kategoriler arası taşıma
+- Todo detaylarını görüntüleme
+
+### 📊 Kategori Sistemi
+
+- Todo (Yapılacak)
+- In Progress (Devam Eden)
+- Done (Tamamlanan)
+- Kategoriler arası kolay taşıma
 
 ### 📁 Veri Yönetimi
 
-- JSON formatında dışa aktarma
-- Yedeklenmiş todo'ları içe aktarma
-- 24 saatte bir otomatik yedekleme
 - Yerel JSON depolama
-
-### 🗑️ Arşiv Sistemi
-
-- Tamamlanan todo'ları otomatik arşivleme
-- Arşivlenmiş todo'ları görüntüleme
-- Arşivden todo'ları geri yükleme
-
-### 📅 Takvim Özellikleri
-
-- Takvim görünümü
-- Bitiş tarihine göre öncelik güncelleme
-- Saatlik öncelik kontrolü
+- Otomatik veri kaydetme
+- JSON formatında dışa aktarma
+- JSON dosyasından içe aktarma
+- Otomatik yedekleme sistemi
 
 ### 🔔 Bildirim Sistemi
 
 - Masaüstü bildirimleri
+- Son tarih yaklaşan görevler için hatırlatmalar
 - Özel bildirim ikonları
 
-## Kurulum
+### 🗑️ Arşiv Sistemi
+
+- Tamamlanan görevleri arşivleme
+- Arşivlenmiş görevleri görüntüleme
+- Arşivden geri yükleme
+
+### 🔗 Diğer Özellikler
+
+- Github sayfasına kolay erişim
+- Klavye kısayolları (ESC ile modal kapatma)
+- Hata yakalama ve loglama
+
+## 🚀 Kurulum
 
 1. Projeyi klonlayın:
 
 ```bash
 git clone https://github.com/berkayderin/Todo-Electron-App.git
-cd deep-todo
+cd Todo-Electron-App
 ```
 
 2. Gerekli bağımlılıkları yükleyin:
@@ -67,7 +81,7 @@ npm install
 npm start
 ```
 
-## Geliştirme
+## 💻 Geliştirme
 
 - Tailwind CSS'i izlemek için:
 
@@ -75,22 +89,16 @@ npm start
 npm run watch
 ```
 
-- Uygulamayı paketlemek için:
-
-```bash
-npm run dist
-```
-
-## Teknolojiler
+## 🛠️ Teknolojiler
 
 - [Electron.js](https://www.electronjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - Node.js
 
-## Lisans
+## 📄 Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır.
 
-## Geliştirici
+## 👨‍💻 Geliştirici
 
 - **Berkay Derin** - [derinberkay67@gmail.com](mailto:derinberkay67@gmail.com)
