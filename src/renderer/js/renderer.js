@@ -694,7 +694,7 @@ function openDetailModal(todo, category) {
 					? `
 				<div class="prose prose-blue max-w-none">
 					<h3 class="text-lg font-medium text-gray-900 dark:text-white">Açıklama</h3>
-					<p class="text-gray-600 dark:text-gray-300">${todo.description}</p>
+					<p class="text-gray-600 dark:text-gray-300 text-sm">${todo.description}</p>
 				</div>
 			`
 					: ''
@@ -1095,7 +1095,8 @@ function createTodoCard(todo, category) {
 	metaSection.className = 'space-y-3'
 
 	const description = document.createElement('p')
-	description.className = 'text-gray-600 dark:text-gray-300 text-sm'
+	description.className =
+		'text-gray-600 dark:text-gray-300 text-sm line-clamp-3 overflow-hidden text-ellipsis'
 	description.textContent = todo.description || ''
 	metaSection.appendChild(description)
 

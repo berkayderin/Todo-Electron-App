@@ -1362,6 +1362,13 @@ select {
   margin-top: 1.5rem;
 }
 
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .flex {
   display: flex;
 }
@@ -1604,6 +1611,10 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.text-ellipsis {
+  text-overflow: ellipsis;
 }
 
 .whitespace-pre-wrap {
@@ -2009,6 +2020,13 @@ select {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .hover\:bg-blue-700:hover {
