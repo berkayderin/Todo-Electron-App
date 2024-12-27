@@ -119,7 +119,7 @@ async function loadArchivedTodos() {
                     ${
 											todo.description
 												? `
-                        <div class="mt-3 text-sm text-gray-600">
+                        <div class="mt-3 text-sm text-gray-600 line-clamp-3 overflow-hidden text-ellipsis">
                             ${todo.description}
                         </div>
                     `
