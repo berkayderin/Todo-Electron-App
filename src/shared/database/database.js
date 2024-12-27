@@ -400,6 +400,18 @@ async function copyTodo(id, sourceCategory) {
 	}
 }
 
+async function deleteAllArchivedTodos() {
+	try {
+		const data = await readTodosFile()
+		data.archived = []
+		await writeTodosFile(data)
+		return true
+	} catch (error) {
+		console.error('Tüm arşivlenmiş görevleri silme hatası:', error)
+		throw error
+	}
+}
+
 module.exports = {
 	initDatabase,
 	addTodo,
@@ -414,5 +426,6 @@ module.exports = {
 	calculatePriority,
 	archiveTodo,
 	unarchiveTodo,
-	copyTodo
+	copyTodo,
+	deleteAllArchivedTodos
 }

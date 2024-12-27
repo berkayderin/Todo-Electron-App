@@ -53,6 +53,70 @@
 	<body
 		class="bg-gradient-to-br from-blue-600 to-blue-700 min-h-screen font-['Plus_Jakarta_Sans']"
 	>
+		<!-- Tümünü Sil Modal -->
+		<div
+			id="deleteAllModal"
+			class="invisible opacity-0 fixed inset-0 z-50"
+		>
+			<div class="fixed inset-0">
+				<div
+					class="absolute inset-0 bg-black opacity-0 transition-opacity duration-300"
+					id="modalOverlay"
+				></div>
+			</div>
+			<div
+				class="fixed inset-0 z-50 flex items-center justify-center"
+			>
+				<div
+					class="relative bg-white rounded-xl p-6 w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 shadow-2xl"
+				>
+					<div class="flex justify-between items-center mb-6">
+						<h3 class="text-xl font-semibold text-gray-900">
+							Tüm Görevleri Sil
+						</h3>
+						<button
+							class="text-gray-400 hover:text-gray-500 close-delete-all-modal"
+						>
+							<svg
+								class="w-6 h-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</div>
+					<div class="space-y-4">
+						<div class="text-gray-600">
+							Tüm arşivlenmiş görevleri silmek istediğinizden emin
+							misiniz? Bu işlem geri alınamaz.
+						</div>
+						<div class="flex justify-end gap-3">
+							<button
+								type="button"
+								class="close-delete-all-modal px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200"
+							>
+								İptal
+							</button>
+							<button
+								type="button"
+								id="confirmDeleteAll"
+								class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200"
+							>
+								Tümünü Sil
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="py-6 px-6">
 			<div class="max-w-7xl mx-auto">
 				<div class="flex items-center justify-between mb-8">
@@ -79,6 +143,24 @@
 							Arşivlenmiş Görevler
 						</h1>
 					</div>
+					<button
+						id="deleteAllArchivedBtn"
+						class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200"
+					>
+						<svg
+							class="w-5 h-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+							/>
+						</svg>
+					</button>
 				</div>
 
 				<div class="bg-white/10 backdrop-blur-lg rounded-xl p-6">
