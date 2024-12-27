@@ -86,83 +86,30 @@ async function loadArchivedTodos() {
 		const archivedTodos = todos.archived || []
 		const container = document.getElementById('archived-todos')
 
-		// Silme modalını ekle
-		const modalHTML = `
-			<div id="deleteAllModal" class="invisible opacity-0 fixed inset-0 flex items-center justify-center z-50">
-				<div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"></div>
-				<div class="relative bg-white rounded-xl p-6 w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 shadow-2xl mx-auto my-auto">
-					<div class="flex justify-between items-center mb-6">
-						<h3 class="text-xl font-semibold text-gray-900">
-							Tüm Görevleri Sil
-						</h3>
-						<button
-							class="text-gray-400 hover:text-gray-500 close-delete-all-modal"
-						>
-							<svg
-								class="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
-					</div>
-					<div class="space-y-4">
-						<div class="flex items-center space-x-3 text-gray-600">
-							<svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-							</svg>
-							<div>
-								<h4 class="text-lg font-medium text-gray-900">Emin misiniz?</h4>
-								<p class="text-sm text-gray-500">Bu işlem geri alınamaz ve tüm arşivlenmiş görevler kalıcı olarak silinecektir.</p>
-							</div>
-						</div>
-						<div class="flex justify-end gap-3">
-							<button
-								type="button"
-								class="close-delete-all-modal px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200"
-							>
-								İptal
-							</button>
-							<button
-								type="button"
-								id="confirmDeleteAll"
-								class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200"
-							>
-								Tümünü Sil
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		`
-
+		// Arşivlenmiş görev yoksa
 		if (archivedTodos.length === 0) {
 			container.innerHTML = `
-				${headerHTML}
-				<div class="text-center text-white/80 py-8">
-					Henüz arşivlenmiş görev bulunmuyor.
+				<div class="flex flex-row items-center justify-center py-8">
+					<p class="text-white text-sm">Arşivlenmiş görev bulunmamaktadır.</p>
 				</div>
-				${modalHTML}
 			`
+			// Tümünü sil butonunu gizle
+			document.getElementById('deleteAllArchivedBtn').style.display =
+				'none'
 			return
 		}
 
-		container.innerHTML = `
-			${headerHTML}
-			${modalHTML}
-			${archivedTodos
-				.sort(
-					(a, b) => new Date(b.archived_at) - new Date(a.archived_at)
-				)
-				.map(
-					(todo) => `
+		// Tümünü sil butonunu göster
+		document.getElementById('deleteAllArchivedBtn').style.display =
+			'block'
+
+		// Arşivlenmiş görevleri listele
+		container.innerHTML = archivedTodos
+			.sort(
+				(a, b) => new Date(b.archived_at) - new Date(a.archived_at)
+			)
+			.map(
+				(todo) => `
 				<div class="bg-white/95 backdrop-blur-sm rounded-xl p-5 max-w-3xl mx-auto">
 					<div class="flex items-center justify-between">
 						<div class="flex items-center space-x-3">
@@ -237,9 +184,8 @@ async function loadArchivedTodos() {
 					}
 				</div>
 			`
-				)
-				.join('')}
-		`
+			)
+			.join('')
 
 		// Event listener'ları ekle
 		document.querySelectorAll('.unarchive-btn').forEach((button) => {
