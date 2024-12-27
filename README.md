@@ -2,7 +2,7 @@
 
 Electron.js ile geliştirilmiş, modern ve kullanıcı dostu bir Todo (Yapılacaklar Listesi) uygulaması.
 
-![Todo-Electron-App Logo](src/assets/icon.ico)
+[![Image](https://i.hizliresim.com/5fewyou.jpg)](https://hizliresim.com/5fewyou)
 
 ## ✨ Özellikler
 
